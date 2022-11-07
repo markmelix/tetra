@@ -40,15 +40,22 @@ class EditBuffer(Module):
         super().refresh()
 
         core = self.core
-        gui_buffer, label, bufman = core.buffer, core.label, core.bufman
+        gui_buffer, label, bufman, event = (
+            core.buffer,
+            core.label,
+            core.bufman,
+            core.last_event(),
+        )
         current_buffer = bufman.current
 
         current_buffer.refresh_name()
 
         label.setText(current_buffer.name)
 
-        if core.last_event() == Event.FILE_OPENED:
+        if event in {Event.FILE_OPENED, Event.NEW_BUFFER_CREATED}:
             gui_buffer.setText(current_buffer.text)
+
+        if event == Event.FILE_OPENED:
             current_buffer._sync()
 
         if current_buffer.synchronized:
