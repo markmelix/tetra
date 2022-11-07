@@ -1,8 +1,9 @@
-import appearance
-import menu
-import buffer
-import statusbar
+import os, sys
 
-__all__ = ["appearance", "menu", "buffer", "statusbar"]
+sys.path.append(os.path.dirname(__file__))
+
+del os, sys
+
+import appearance, menu, edit_buffer, statusbar
 
 MODULES = list(filter(lambda m: not m.startswith("__"), globals().keys()))

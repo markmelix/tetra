@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="global_layout_widget" native="true">
+   <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -23,11 +23,33 @@
       <height>440</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="global_layout">
-     <item row="0" column="0">
+    <widget class="QWidget" name="tab_5">
+     <attribute name="title">
+      <string>Tab 1</string>
+     </attribute>
+     <widget class="QWidget" name="global_layout_widget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>-580</x>
+        <y>10</y>
+        <width>680</width>
+        <height>440</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="global_layout"/>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>681</width>
+        <height>411</height>
+       </rect>
+      </property>
       <layout class="QVBoxLayout" name="edit_buffer_layout">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="opened_label">
          <property name="text">
           <string>Пустой буфер</string>
          </property>
@@ -37,11 +59,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QsciScintilla" name="buffer"/>
+        <widget class="QPlainTextEdit" name="buffer"/>
        </item>
       </layout>
-     </item>
-    </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_6">
+     <attribute name="title">
+      <string>Tab 2</string>
+     </attribute>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -77,40 +104,25 @@
    <property name="text">
     <string>Новый</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
   </action>
   <action name="save_file_action">
    <property name="text">
     <string>Сохранить</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="save_file_as_action">
    <property name="text">
     <string>Сохранить как</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
   </action>
   <action name="open_file_action">
    <property name="text">
     <string>Открыть</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
   </action>
   <action name="settings_action">
    <property name="text">
     <string>Настройки</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+S</string>
    </property>
   </action>
   <action name="about_action">
@@ -119,13 +131,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QsciScintilla</class>
-   <extends>QPlainTextEdit</extends>
-   <header>PyQt5.Qsci</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -14,6 +14,10 @@ class Module:
 
         self.can_disable = can_disable
         self.enabled = self.fetch_enabled()
+        self.loaded = False
+
+    def is_loaded(self):
+        return self.loaded
 
     def cur(self):
         return self.con.cursor()
@@ -24,7 +28,7 @@ class Module:
     def append_table(self):
         cur = self.cur()
         if not cur.execute("SELECT * FROM Modules WHERE id=?", (self.id,)).fetchone():
-            cur.execute("INSERT INTO Modules VALUES (?,?)", (self.id, False))
+            cur.execute("INSERT INTO Modules VALUES (?,?)", (self.id, True))
             self.commit()
 
     def init_default_settings(self, settings):
@@ -75,12 +79,11 @@ class Module:
 
         if not settings and self.default_settings:
             loaded_before = False
-            query = "INSERT INTO Settings VALUES "
+            query = "INSERT INTO Settings(module,name,value,kind) VALUES "
 
             for setting in self.default_settings:
                 query += "(" + ",".join(map(lambda s: f"'{s}'", setting)) + "),"
 
-            print(query)
             cur.execute(query[:-1])
             self.commit()
 
@@ -95,7 +98,10 @@ class Module:
             self.load()
 
     def load(self):
-        pass
+        self.loaded = True
 
     def unload(self):
+        self.loaded = False
+
+    def refresh(self):
         pass
