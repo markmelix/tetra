@@ -1,10 +1,10 @@
 from enum import Enum
+from copy import deepcopy
 
 
 class Setting:
-    def __init__(self, id, name=None, description="", value=None):
-        self.id = id
-        self.name = id if name is None else name
+    def __init__(self, name, description="", value=None):
+        self.name = name
         self.description = description
         self.value = value
 
@@ -12,7 +12,6 @@ class Setting:
 class IntSetting(Setting):
     def __init__(
         self,
-        id,
         name=None,
         description="",
         value=None,
@@ -20,7 +19,7 @@ class IntSetting(Setting):
         max_value=9999,
         step=1,
     ):
-        super().__init__(id, name, description, value)
+        super().__init__(name, description, value)
 
         self.min_value = min_value
         self.max_value = max_value
@@ -28,7 +27,7 @@ class IntSetting(Setting):
 
 
 class FileSetting(Setting):
-    def __init__(self, id, name=None, description="", value=None, ext=None):
-        super().__init__(id, name, description, value)
+    def __init__(self, name=None, description="", value=None, ext=None):
+        super().__init__(name, description, value)
 
         self.ext = ext

@@ -21,6 +21,8 @@ class Editor(QMainWindow):
         self.init_buffer_manager()
         self.init_modules()
 
+        self.modules["database"].unload()
+
     def init_event_system(self):
         self.events = []
 

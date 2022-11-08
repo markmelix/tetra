@@ -1,24 +1,25 @@
 from module import Module
 from setting import *
+from copy import copy
 
 import sqlite3
 
 NAME = "База данных"
 DESCRIPTION = "Сохраняет состояние настроек редактора в базу данных"
 
-DEFAULT_SETTINGS = []
+DEFAULT_SETTINGS = {}
 
-CREATE_TABLE_QUERIES = [
-    """CREATE TABLE IF NOT EXISTS modules (
+CREATE_TABLES_QUERY = """
+CREATE TABLE IF NOT EXISTS modules (
 	id string PRIMARY KEY,
 	enabled boolean
-); """,
-    """CREATE TABLE IF NOT EXISTS settings (
+);
+CREATE TABLE IF NOT EXISTS settings (
     id string PRIMARY KEY,
     module string,
     value string
-);""",
-]
+);
+"""
 
 
 class Database(Module):
@@ -33,8 +34,7 @@ class Database(Module):
     def create_tables(self):
         """Создает нужные таблицы в базе данных, если они ещё не были созданы"""
 
-        for query in CREATE_TABLE_QUERIES:
-            self.con.execute(query)
+        self.con.executescript(CREATE_TABLES_QUERY)
 
     def inject_features(self):
         """Внедряет функционал для работы с базой данных в программу"""
@@ -42,7 +42,7 @@ class Database(Module):
         con = self.con
         cur = self.con.cursor()
 
-        def init(mod, *args, **kwargs):
+        def module_init(mod, *args, **kwargs):
             Module._Module__init(mod, *args, **kwargs)
 
             cur.execute(
@@ -53,13 +53,44 @@ class Database(Module):
                     "SELECT enabled FROM modules WHERE id=?", (mod.id,)
                 ).fetchone()[0]
             )
+
+            for setting_id, setting in mod.default_settings.items():
+                id, module, value = f"{mod.id}:{setting_id}", mod.id, setting.value
+                cur.execute(
+                    "INSERT OR IGNORE INTO settings VALUES (?,?,?)", (id, module, value)
+                )
+
+            def row_to_setting(row):
+                id, value = row
+                id = id.split(":")[-1]
+                setting = deepcopy(mod.default_settings[id])
+                setting.value = value
+
+                return setting
+
+            setting_rows = cur.execute(
+                "SELECT id,value FROM settings WHERE module IN (SELECT id FROM modules WHERE id = ?)",
+                (mod.id,),
+            ).fetchall()
+            mod.settings = map(row_to_setting, setting_rows)
+
             con.commit()
 
-        def refresh(mod):
-            mod._Module__refresh()
+        def update_enabled_state(mod, state):
+            cur.execute("UPDATE modules SET enabled=? WHERE id = ?", (state, mod.id))
+            con.commit()
 
-        Module.__init__ = init
-        Module.refresh = refresh
+        def module_enable(mod, *args, **kwargs):
+            Module._Module__enable(mod, *args, **kwargs)
+            update_enabled_state(mod, True)
+
+        def module_disable(mod, *args, **kwargs):
+            Module._Module__disable(mod, *args, **kwargs)
+            update_enabled_state(mod, False)
+
+        Module.__init__ = module_init
+        Module.enable = module_enable
+        Module.disable = module_disable
 
         self.core.con = self.con
 
@@ -70,6 +101,12 @@ class Database(Module):
 
     def eject_features(self):
         """Убирает функционал для работы с базой данных из программы"""
+
+        Module.__init__ = Module._Module__init
+        Module.enable = Module._Module__enable
+        Module.disable = Module._Module__disable
+
+        del self.core.con
 
     def load(self):
         super().load()

@@ -6,7 +6,7 @@ from module import Module
 NAME = "Буфер редактирования"
 DESCRIPTION = "В буфере редактирования происходит редактирование файлов"
 
-DEFAULT_SETTINGS = []
+DEFAULT_SETTINGS = {}
 
 
 class EditBuffer(Module):

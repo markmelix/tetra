@@ -4,7 +4,7 @@ from module import Module
 NAME = "Меню"
 DESCRIPTION = "Делает кнопки меню функциональными"
 
-DEFAULT_SETTINGS = []
+DEFAULT_SETTINGS = {}
 
 
 class Menu(Module):
