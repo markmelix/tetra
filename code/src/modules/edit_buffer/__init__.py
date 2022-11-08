@@ -15,7 +15,7 @@ class EditBuffer(Module):
 
     def sync_current(self):
         core = self.core
-        current, buffer = core.buffers.current, core.buffer
+        current, buffer = core.bufman.current, core.buffer
 
         current.set_text(buffer.text())
 
@@ -36,26 +36,17 @@ class EditBuffer(Module):
     def unload(self):
         super().unload()
 
-    def highlight_synchronized(self):
-        core = self.core
-        current_buffer, label = core.buffers.current, core.label
-
-        if current_buffer.synchronized:
-            label.setStyleSheet("color: black;")
-        else:
-            label.setStyleSheet("color: red;")
-
     def refresh(self):
         super().refresh()
 
         core = self.core
-        gui_buffer, label, buffers, event = (
+        gui_buffer, label, bufman, event = (
             core.buffer,
             core.label,
-            core.buffers,
+            core.bufman,
             core.last_event(),
         )
-        current_buffer = buffers.current
+        current_buffer = bufman.current
 
         current_buffer.refresh_name()
 
@@ -67,4 +58,7 @@ class EditBuffer(Module):
         if event == Event.FILE_OPENED:
             current_buffer._sync()
 
-        self.highlight_synchronized()
+        if current_buffer.synchronized:
+            label.setStyleSheet("color: black;")
+        else:
+            label.setStyleSheet("color: red;")

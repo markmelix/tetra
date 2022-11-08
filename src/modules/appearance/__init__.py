@@ -1,15 +1,25 @@
 from module import Module
+from setting import *
 
 NAME = "Внешний вид"
 DESCRIPTION = "Делает редактор кода графическим"
 
 DEFAULT_SETTINGS = [
-    {
-        "id": "main_ui_file",
-        "name": "Основной UI файл программы",
-        "value": "resources/main.ui",
-        "kind": "FilePath('ui')",
-    }
+    FileSetting(
+        "theme_file",
+        name="Файл темы программы",
+        description="Тема программы - это CSS файл, в котором прописаны стили различных элементов программы",
+        value="theme.css",
+        ext="css",
+    ),
+    IntSetting(
+        "font_size",
+        name="Размер шрифта",
+        value=14,
+        min_value=4,
+        max_value=72,
+        step=1,
+    ),
 ]
 
 

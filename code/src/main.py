@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 import modules
 
 from buffer import BufManager
@@ -10,14 +11,30 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
 
 
+CREATE_TABLES_QUERIES = [
+    """CREATE TABLE IF NOT EXISTS Settings (
+	id varchar PRIMARY KEY,
+	module varchar,
+	name varchar,
+	value varchar,
+	kind varchar
+);""",
+    """CREATE TABLE IF NOT EXISTS Modules (
+	id varchar PRIMARY KEY,
+	enabled boolean
+); """,
+]
+
+
 class Editor(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.modules = {}
+        self.modules = []
 
         self.init_event_system()
         self.init_ui()
+        self.init_db()
         self.init_buffer_manager()
         self.init_modules()
 
@@ -28,12 +45,22 @@ class Editor(QMainWindow):
         return self.events[-1]
 
     def init_buffer_manager(self):
-        self.buffers = BufManager()
-        self.buffers.append_empty()
+        self.bufman = BufManager()
+        self.bufman.append_empty()
         self.raise_event(Event.NEW_BUFFER_CREATED)
 
     def init_ui(self):
         uic.loadUi("resources/main.ui", self)
+
+    def create_tables(self):
+        cur = self.con.cursor()
+        for query in CREATE_TABLES_QUERIES:
+            cur.execute(query)
+
+    def init_db(self):
+        self.con = sqlite3.connect("db.sqlite")
+
+        self.create_tables()
 
     def init_module(self, module):
         # Трансформировать название_модуля в НазваниеМодуля
@@ -44,20 +71,15 @@ class Editor(QMainWindow):
     def init_modules(self):
         for module in MODULES:
             mod = self.init_module(module)
-
-            if module == "database":
-                mod.load()
-            else:
-                mod.load_if_enabled()
-
-            self.modules[module] = mod
+            mod.load_if_enabled()
+            self.modules.append(mod)
 
     def unload_modules(self):
-        for module in filter(Module.is_loaded, self.modules.values()):
+        for module in self.modules:
             module.unload()
 
     def refresh_modules(self):
-        for module in filter(Module.is_loaded, self.modules.values()):
+        for module in filter(Module.is_loaded, self.modules):
             module.refresh()
 
     def closeEvent(self, event):
@@ -70,11 +92,11 @@ class Editor(QMainWindow):
 
     @apply_event(Event.NEW_BUFFER_CREATED)
     def create_new_file(self):
-        self.buffers.append_empty()
+        self.bufman.append_empty()
 
     @apply_event(Event.FILE_SAVED)
     def save_file(self):
-        current_buffer = self.buffers.current
+        current_buffer = self.bufman.current
         if current_buffer.sync_file is None:
             self.save_file_as()
         else:
@@ -94,8 +116,8 @@ class Editor(QMainWindow):
         if path == "":
             return
 
-        self.buffers.current.sync_file = path
-        self.buffers.current.sync()
+        self.bufman.current.sync_file = path
+        self.bufman.current.sync()
 
     @apply_event(Event.FILE_OPENED)
     def open_file(self):
@@ -105,10 +127,7 @@ class Editor(QMainWindow):
             self, "Открыть файл", "", "", "", options=options
         )
 
-        if path == "":
-            return
-
-        self.buffers.append(sync_file=path, switch=True)
+        self.bufman.append(sync_file=path, switch=True)
 
     @apply_event(Event.SETTINGS_OPENED)
     def open_settings(self):
