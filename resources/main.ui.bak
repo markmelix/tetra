@@ -19,70 +19,29 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>671</width>
-      <height>411</height>
+      <width>680</width>
+      <height>440</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="global_layout">
-     <item row="0" column="1">
-      <widget class="QTabWidget" name="tabbar">
-       <property name="tabPosition">
-        <enum>QTabWidget::North</enum>
-       </property>
-       <property name="tabShape">
-        <enum>QTabWidget::Rounded</enum>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <property name="elideMode">
-        <enum>Qt::ElideNone</enum>
-       </property>
-       <property name="tabsClosable">
-        <bool>true</bool>
-       </property>
-       <property name="movable">
-        <bool>true</bool>
-       </property>
-       <property name="tabBarAutoHide">
-        <bool>false</bool>
-       </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string notr="true">Пустой буфер</string>
-        </attribute>
-        <widget class="QWidget" name="">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>651</width>
-           <height>361</height>
-          </rect>
+     <item row="0" column="0">
+      <layout class="QVBoxLayout" name="edit_buffer_layout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Пустой буфер</string>
          </property>
-         <layout class="QVBoxLayout" name="edit_buffer_layout">
-          <item>
-           <widget class="QsciScintilla" name="buffer"/>
-          </item>
-         </layout>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
         </widget>
-       </widget>
-      </widget>
+       </item>
+       <item>
+        <widget class="QsciScintilla" name="buffer"/>
+       </item>
+      </layout>
      </item>
     </layout>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>426</y>
-      <width>151</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

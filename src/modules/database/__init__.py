@@ -1,6 +1,6 @@
 from module import Module
 from setting import *
-from copy import copy
+from copy import deepcopy
 
 import sqlite3
 
@@ -48,6 +48,7 @@ class Database(Module):
             cur.execute(
                 "INSERT OR IGNORE INTO modules VALUES (?,?)", (mod.id, mod.enabled)
             )
+
             mod.enabled = bool(
                 cur.execute(
                     "SELECT enabled FROM modules WHERE id=?", (mod.id,)
@@ -66,18 +67,21 @@ class Database(Module):
                 setting = deepcopy(mod.default_settings[id])
                 setting.value = value
 
-                return setting
+                return id, setting
 
             setting_rows = cur.execute(
-                "SELECT id,value FROM settings WHERE module IN (SELECT id FROM modules WHERE id = ?)",
+                "SELECT id,value FROM settings WHERE module IN (SELECT id FROM modules WHERE id=?)",
                 (mod.id,),
             ).fetchall()
-            mod.settings = map(row_to_setting, setting_rows)
+
+            mod.settings = {
+                id: setting for id, setting in map(row_to_setting, setting_rows)
+            }
 
             con.commit()
 
         def update_enabled_state(mod, state):
-            cur.execute("UPDATE modules SET enabled=? WHERE id = ?", (state, mod.id))
+            cur.execute("UPDATE modules SET enabled=? WHERE id=?", (state, mod.id))
             con.commit()
 
         def module_enable(mod, *args, **kwargs):
@@ -88,9 +92,19 @@ class Database(Module):
             Module._Module__disable(mod, *args, **kwargs)
             update_enabled_state(mod, False)
 
+        def module_save_settings(mod):
+            """Сохраняет настройки модуля в базу данных"""
+            for id, setting in mod.settings.items():
+                cur.execute(
+                    "UPDATE settings SET value=? WHERE id=?",
+                    (setting.value, f"{mod.id}:{id}"),
+                )
+                con.commit()
+
         Module.__init__ = module_init
         Module.enable = module_enable
         Module.disable = module_disable
+        Module.save_settings = module_save_settings
 
         self.core.con = self.con
 
@@ -105,6 +119,8 @@ class Database(Module):
         Module.__init__ = Module._Module__init
         Module.enable = Module._Module__enable
         Module.disable = Module._Module__disable
+
+        del Module.save_settings
 
         del self.core.con
 

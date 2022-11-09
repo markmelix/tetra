@@ -1,8 +1,6 @@
-from enum import Enum
-from copy import deepcopy
-
-
 class Setting:
+    """Настройка модуля"""
+
     def __init__(self, name, description="", value=None):
         self.name = name
         self.description = description
@@ -10,6 +8,8 @@ class Setting:
 
 
 class IntSetting(Setting):
+    """Настройка, принимающая в качестве значения целое число"""
+
     def __init__(
         self,
         name=None,
@@ -27,6 +27,9 @@ class IntSetting(Setting):
 
 
 class FileSetting(Setting):
+    """Настройка, принимающая в качестве значения путь до файла в файлововй
+    системе"""
+
     def __init__(self, name=None, description="", value=None, ext=None):
         super().__init__(name, description, value)
 
