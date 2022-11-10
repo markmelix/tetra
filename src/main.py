@@ -7,6 +7,7 @@ from event import Event, apply_event
 from module import Module
 
 from PyQt5 import uic
+from PyQt5.Qsci import *
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication
 
 
@@ -25,14 +26,20 @@ class Editor(QMainWindow):
 
     def init_event_system(self):
         """Инициализирует систему событий"""
+
         self.events = []
 
     def last_event(self):
         """Возвращает последнее вызванное событие"""
-        return self.events[-1]
+
+        try:
+            return self.events[-1]
+        except IndexError:
+            return None
 
     def init_buffer_manager(self):
         """Инициализирует систему управления буферами редактора"""
+
         self.buffers = BufManager()
         self.buffers.append_empty()
         self.raise_event(Event.NEW_BUFFER_CREATED)
@@ -85,6 +92,14 @@ class Editor(QMainWindow):
 
         self.events.append(event)
         self.refresh_modules()
+
+    def edit_buffer_instance(self):
+        """Создает и возвращает пустой графический буфер редактирования"""
+        return QsciScintilla()
+
+    def buffer(self):
+        """Возвращает ссылку на текущий выбранный графический буфер"""
+        return self.tabbar.currentWidget()
 
     @apply_event(Event.NEW_BUFFER_CREATED)
     def create_new_file(self):

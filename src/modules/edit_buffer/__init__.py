@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QColor
 from PyQt5.Qsci import *
 from event import Event
 from module import Module
@@ -15,9 +16,9 @@ class EditBuffer(Module):
 
     def sync_current(self):
         core = self.core
-        current, buffer = core.buffers.current, core.buffer
+        gui_buffer, buffer = core.buffer(), core.buffers.current
 
-        current.set_text(buffer.text())
+        buffer.set_text(gui_buffer.text())
 
         core.raise_event(Event.BUFFER_TEXT_CHANGED)
 
@@ -26,10 +27,7 @@ class EditBuffer(Module):
     def load(self):
         super().load()
 
-        core = self.core
-        buffer = core.buffer
-
-        buffer.textChanged.connect(self.sync_current)
+        self.core.buffer().textChanged.connect(self.sync_current)
 
         self.refresh()
 
@@ -38,33 +36,32 @@ class EditBuffer(Module):
 
     def highlight_synchronized(self):
         core = self.core
-        current_buffer, label = core.buffers.current, core.label
+        tabbar = core.tabbar.tabBar()
+        tab = tabbar.currentIndex()
+        synced = core.buffers.current.synchronized
 
-        if current_buffer.synchronized:
-            label.setStyleSheet("color: black;")
-        else:
-            label.setStyleSheet("color: red;")
+        tabbar.setTabTextColor(
+            tab, QColor(255, 0, 0) if not synced else QColor(0, 0, 0)
+        )
 
     def refresh(self):
         super().refresh()
 
         core = self.core
-        gui_buffer, label, buffers, event = (
-            core.buffer,
-            core.label,
-            core.buffers,
+        gui_buffer, buffer, event = (
+            core.buffer(),
+            core.buffers.current,
             core.last_event(),
         )
-        current_buffer = buffers.current
 
-        current_buffer.refresh_name()
+        buffer.refresh_name()
 
-        label.setText(current_buffer.name)
+        print(event, buffer, buffer.name, buffer.text)
 
         if event in {Event.FILE_OPENED, Event.NEW_BUFFER_CREATED}:
-            gui_buffer.setText(current_buffer.text)
+            gui_buffer.setText(buffer.text)
 
         if event == Event.FILE_OPENED:
-            current_buffer._sync()
+            buffer._sync()
 
         self.highlight_synchronized()

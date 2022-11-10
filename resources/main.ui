@@ -33,7 +33,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>-1</number>
        </property>
        <property name="elideMode">
         <enum>Qt::ElideNone</enum>
@@ -47,26 +47,6 @@
        <property name="tabBarAutoHide">
         <bool>false</bool>
        </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string notr="true">Пустой буфер</string>
-        </attribute>
-        <widget class="QWidget" name="">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>651</width>
-           <height>361</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="edit_buffer_layout">
-          <item>
-           <widget class="QsciScintilla" name="buffer"/>
-          </item>
-         </layout>
-        </widget>
-       </widget>
       </widget>
      </item>
     </layout>
@@ -74,8 +54,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>426</y>
+      <x>20</x>
+      <y>420</y>
       <width>151</width>
       <height>31</height>
      </rect>
@@ -160,13 +140,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QsciScintilla</class>
-   <extends>QPlainTextEdit</extends>
-   <header>PyQt5.Qsci</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

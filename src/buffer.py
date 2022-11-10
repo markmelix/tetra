@@ -103,6 +103,9 @@ class BufManager:
 
         return len(self.buffers) - 1
 
+    def current_index(self):
+        return self.buffers.index(self.current)
+
     def append_empty(self, switch=True):
         """Добавить пустой буфер. Если флаг switch установлен в False, не
         переключатся на только что созданный буфер"""
