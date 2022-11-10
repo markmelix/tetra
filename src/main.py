@@ -106,34 +106,38 @@ class Editor(QMainWindow):
         self.buffers.add_empty(self.gui_buffer_instance())
 
     @apply_event(Event.FILE_SAVED)
-    def save_file(self):
+    def save_file(self, buffer=None):
         """Сохраняет открытый файл"""
 
-        current_buffer = self.buffers.current()
-        if current_buffer.sync_file is None:
-            self.save_file_as()
+        if buffer is None:
+            buffer = self.buffers.current()
+
+        if buffer.sync_file is None:
+            return self.save_file_as(buffer)
         else:
-            current_buffer.sync()
+            buffer.sync()
 
     @apply_event(Event.FILE_SAVED_AS)
-    def save_file_as(self):
+    def save_file_as(self, buffer=None):
         """Сохраняет открытый файл как"""
 
         options = QFileDialog.Options()
 
-        path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Сохранить файл как",
-            "",
-            "",
+        path, status = QFileDialog.getSaveFileName(
+            self, "Сохранить файл как", "", "", options=options
         )
+        status = bool(status)
 
         if path == "":
-            return
+            return status
 
-        current_buffer = self.buffers.current()
-        current_buffer.sync_file = path
-        current_buffer.sync()
+        if buffer is None:
+            buffer = self.buffers.current()
+
+        buffer.sync_file = path
+        buffer.sync()
+
+        return status
 
     @apply_event(Event.FILE_OPENED)
     def open_file(self):

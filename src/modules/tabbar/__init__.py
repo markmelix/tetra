@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QTabBar
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.Qsci import *
 from event import Event
 from module import Module
@@ -15,17 +15,60 @@ class Tabbar(Module):
     def __init__(self, core):
         super().__init__(NAME, DESCRIPTION, DEFAULT_SETTINGS, core, can_disable=False)
 
-    def tab_changed(self, _):
+    def ask_for_save(self):
+        dialog = QMessageBox()
+        dialog.setIcon(QMessageBox.Question)
+        dialog.setText("Файл был изменен.")
+        dialog.setInformativeText("Сохранить изменения?")
+        dialog.setStandardButtons(
+            QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
+        )
+        dialog.setDefaultButton(QMessageBox.Save)
+
+        return dialog.exec()
+
+    def remove_tab_and_buffer(self, idx):
         core = self.core
         tabbar = core.tabbar
-        tabbar.currentWidget()
+        gui_buffer = tabbar.widget(idx)
+
+        tabbar.removeTab(idx)
+        core.buffers.remove(
+            gui_buffer, new_current=tabbar.widget(tabbar.currentIndex())
+        )
+
+        core.raise_event(Event.TAB_CLOSED)
+
+    def close_tab(self, idx):
+        buffers = self.core.buffers
+
+        if len(buffers) == 1:
+            return
+
+        tabbar = self.core.tabbar
+        gui_buffer = tabbar.widget(idx)
+        buffer = buffers[gui_buffer]
+
+        if not buffer.synchronized:
+            answer = self.ask_for_save()
+
+            if answer == QMessageBox.Save:
+                status = self.core.save_file(buffer)
+                if not status:
+                    return
+            elif answer == QMessageBox.Discard:
+                pass
+            else:
+                return
+
+        self.remove_tab_and_buffer(idx)
 
     def load(self):
         super().load()
 
-        core = self.core
+        tabbar = self.core.tabbar
 
-        core.tabbar.currentChanged.connect(self.tab_changed)
+        tabbar.tabCloseRequested.connect(self.close_tab)
 
         self.refresh()
 

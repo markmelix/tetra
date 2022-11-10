@@ -122,6 +122,20 @@ class BufManager:
         """Добавить пустой буфер"""
         self.add(gui_link)
 
+    def remove(self, gui_link, new_current=None):
+        """Удаляет буфер"""
+        if gui_link != self.current_link:
+            del self.buffers[gui_link]
+            return
+
+        if new_current is None:
+            self.current_link = next(iter(self.buffers.keys()))
+        else:
+            self.current_link = new_current
+
+    def __len__(self):
+        return len(self.buffers)
+
     def __getitem__(self, gui_link):
         """Возвращает буфер, привязанный к данному графическому буферу"""
         return self.buffers[gui_link]
