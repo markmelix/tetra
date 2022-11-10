@@ -1,7 +1,7 @@
 import sys
 import modules
 
-from buffer import BufManager
+from buffer import BufManager, GuiBuffer
 from modules import MODULES
 from event import Event, apply_event
 from module import Module
@@ -21,8 +21,8 @@ class Editor(QMainWindow):
 
         self.init_event_system()
         self.init_ui()
-        self.init_buffer_manager()
         self.init_modules()
+        self.init_buffer_manager()
 
     def init_event_system(self):
         """Инициализирует систему событий"""
@@ -41,7 +41,7 @@ class Editor(QMainWindow):
         """Инициализирует систему управления буферами редактора"""
 
         self.buffers = BufManager()
-        self.buffers.append_empty()
+        self.buffers.add_empty(self.gui_buffer_instance())
         self.raise_event(Event.NEW_BUFFER_CREATED)
 
     def init_ui(self):
@@ -93,25 +93,23 @@ class Editor(QMainWindow):
         self.events.append(event)
         self.refresh_modules()
 
-    def edit_buffer_instance(self):
+    def gui_buffer_instance(self):
         """Создает и возвращает пустой графический буфер редактирования"""
-        return QsciScintilla()
+        return GuiBuffer()
 
-    def buffer(self):
-        """Возвращает ссылку на текущий выбранный графический буфер"""
-        return self.tabbar.currentWidget()
+    __gui_buffer_instance = gui_buffer_instance
 
     @apply_event(Event.NEW_BUFFER_CREATED)
     def create_new_file(self):
         """Создает новый файл"""
 
-        self.buffers.append_empty()
+        self.buffers.add_empty(self.gui_buffer_instance())
 
     @apply_event(Event.FILE_SAVED)
     def save_file(self):
-        """Сохрагяет открытый файл"""
+        """Сохраняет открытый файл"""
 
-        current_buffer = self.buffers.current
+        current_buffer = self.buffers.current()
         if current_buffer.sync_file is None:
             self.save_file_as()
         else:
@@ -133,8 +131,9 @@ class Editor(QMainWindow):
         if path == "":
             return
 
-        self.buffers.current.sync_file = path
-        self.buffers.current.sync()
+        current_buffer = self.buffers.current()
+        current_buffer.sync_file = path
+        current_buffer.sync()
 
     @apply_event(Event.FILE_OPENED)
     def open_file(self):
@@ -149,7 +148,7 @@ class Editor(QMainWindow):
         if path == "":
             return
 
-        self.buffers.append(sync_file=path, switch=True)
+        self.buffers.add(self.gui_buffer_instance(), sync_file=path)
 
     @apply_event(Event.SETTINGS_OPENED)
     def open_settings(self):

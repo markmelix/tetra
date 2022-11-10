@@ -15,7 +15,12 @@ class NoSyncFileError(Exception):
 class Buffer:
     """Абстрактный текстовый буфер редактора"""
 
-    def __init__(self, empty_name=DEFAULT_EMPTY_BUFFER_NAME, sync_file=None, text=""):
+    def __init__(
+        self,
+        empty_name=DEFAULT_EMPTY_BUFFER_NAME,
+        sync_file=None,
+        text="",
+    ):
         """Инициализирует буфер
 
         Параметры:
@@ -34,6 +39,9 @@ class Buffer:
 
         if sync_file is not None:
             self.sync(Sync.FROM_FILE)
+
+    def __str__(self):
+        return f"{self.__class__.__name__}(name='{self.name}', synchronized={self.synchronized})"
 
     def set_text(self, text):
         """Устанавливает текст буфера"""
@@ -66,6 +74,8 @@ class Buffer:
 
         self.synchronized = True
 
+        self.refresh_name()
+
     def _sync(self):
         """Устанавливает флаг синхронизации буфера с файлом синхронизации в
         True. Данный метод должен быть использован только классом Buffer либо в
@@ -89,32 +99,46 @@ class BufManager:
     """Менеджер управления текстовыми буферами"""
 
     def __init__(self):
-        self.buffers = []
+        self.buffers = {}
 
-    def append(self, *args, **kwargs):
-        """Добавить буфер с заданными параметрами"""
+    def add(self, gui_link, *args, **kwargs):
+        """Добавить буфер с заданными параметрами.
 
-        if switch := kwargs.get("switch", False):
-            del kwargs["switch"]
+        Параметры:
+        gui_link - ссылка на графический буфер, с которым
+                   необходимо связать созданный абстрактный буфер
+        """
 
-        self.buffers.append(Buffer(*args, **kwargs))
+        self.buffers[gui_link] = Buffer(*args, **kwargs)
+        self.current_link = gui_link
 
-        self.current = self.buffers[-1] if switch else None
+    def current(self):
+        return self.buffers[self.current_link]
 
-        return len(self.buffers) - 1
+    def switch(self, gui_link):
+        self.current_link = gui_link
 
-    def current_index(self):
-        return self.buffers.index(self.current)
+    def add_empty(self, gui_link):
+        """Добавить пустой буфер"""
+        self.add(gui_link)
 
-    def append_empty(self, switch=True):
-        """Добавить пустой буфер. Если флаг switch установлен в False, не
-        переключатся на только что созданный буфер"""
-        self.append(switch=switch)
+    def __getitem__(self, gui_link):
+        """Возвращает буфер, привязанный к данному графическому буферу"""
+        return self.buffers[gui_link]
 
-    def pop(self, idx):
-        """Удаляет и возвращает удаленный буфер с данным индексом"""
-        return self.buffers.pop(idx)
 
-    def __getitem__(self, i):
-        """Возвращает буфер с данным индексом"""
-        return self.buffers[i]
+class GuiBuffer:
+    """Общий класс графических буферов"""
+
+    def __init__(self):
+        self.buffer = ""
+
+    def text_changed(self, func):
+        self.text_changed_hook = func()
+
+    def set_text(self, text):
+        self.buffer = text
+        self.text_changed_hook()
+
+    def get_text(self):
+        return self.buffer

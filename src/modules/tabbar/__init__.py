@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QTabBar
 from PyQt5.Qsci import *
 from event import Event
@@ -31,6 +32,29 @@ class Tabbar(Module):
     def unload(self):
         super().unload()
 
+    def sync_buffer(self):
+        core = self.core
+        buffers = core.buffers
+        current_link, current = buffers.current_link, buffers.current()
+
+        current.set_text(current_link.get_text())
+
+        if core.last_event() != Event.FILE_OPENED:
+            core.raise_event(Event.BUFFER_TEXT_CHANGED)
+        else:
+            core.raise_event(None)
+
+        self.refresh()
+
+    def highlight_desynced(self):
+        core = self.core
+        tabbar = core.tabbar.tabBar()
+        tab = tabbar.currentIndex()
+        current = core.buffers.current()
+        synced = current.synchronized
+
+        tabbar.setTabTextColor(tab, QColor(0, 0, 0) if synced else QColor(255, 0, 0))
+
     def refresh(self):
         super().refresh()
 
@@ -39,10 +63,25 @@ class Tabbar(Module):
         event = core.last_event()
 
         if event in {Event.FILE_OPENED, Event.NEW_BUFFER_CREATED}:
-            current = core.buffers.current
-            buffer = core.edit_buffer_instance()
+            current_link = core.buffers.current_link
+            current = core.buffers.current()
 
-            tabbar.insertTab(0, buffer, current.name)
+            current_link.text_changed(self.sync_buffer)
+            current_link.set_text(current.text)
+
+            tabbar.insertTab(0, current_link, current.name)
             tabbar.setCurrentIndex(0)
 
-            # core.raise_event(Event.NEW_TAB_CREATED)
+        if event == Event.FILE_SAVED_AS:
+            tabbar.setTabText(tabbar.currentIndex(), core.buffers.current().name)
+
+        if event in {Event.FILE_OPENED, Event.FILE_SAVED_AS, Event.FILE_SAVED}:
+            core.buffers.current()._sync()
+
+        if event in {
+            Event.NEW_BUFFER_CREATED,
+            Event.BUFFER_TEXT_CHANGED,
+            Event.FILE_SAVED_AS,
+            Event.FILE_SAVED,
+        }:
+            self.highlight_desynced()
