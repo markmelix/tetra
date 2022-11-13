@@ -1,10 +1,12 @@
 import sys
 import modules
 
+from enum import Enum
 from buffer import BufManager, GuiBuffer
 from modules import MODULES
 from event import Event, apply_event
 from module import Module
+from utils import SaveStatus
 
 from PyQt5 import uic
 from PyQt5.Qsci import *
@@ -105,20 +107,24 @@ class Editor(QMainWindow):
 
         self.buffers.add_empty(self.gui_buffer_instance())
 
-    @apply_event(Event.FILE_SAVED)
-    def save_file(self, buffer=None):
+    def save_file(self, buffer=None, raise_event=True):
         """Сохраняет открытый файл"""
 
         if buffer is None:
             buffer = self.buffers.current()
 
-        if buffer.sync_file is None:
-            return self.save_file_as(buffer)
+        if buffer.file is None:
+            status = self.save_file_as(buffer, raise_event=raise_event)
         else:
             buffer.sync()
+            status = SaveStatus.SAVED
 
-    @apply_event(Event.FILE_SAVED_AS)
-    def save_file_as(self, buffer=None):
+        if raise_event:
+            self.raise_event(Event.FILE_SAVED)
+
+        return status
+
+    def save_file_as(self, buffer=None, raise_event=True):
         """Сохраняет открытый файл как"""
 
         options = QFileDialog.Options()
@@ -126,16 +132,19 @@ class Editor(QMainWindow):
         path, status = QFileDialog.getSaveFileName(
             self, "Сохранить файл как", "", "", options=options
         )
-        status = bool(status)
+        status = SaveStatus.SAVED if bool(status) else SaveStatus.CANCELED
 
         if path == "":
-            return status
+            return SaveStatus.CANCELED
 
         if buffer is None:
             buffer = self.buffers.current()
 
-        buffer.sync_file = path
+        buffer.set_sync_file(path)
         buffer.sync()
+
+        if raise_event:
+            self.raise_event(Event.FILE_SAVED_AS)
 
         return status
 

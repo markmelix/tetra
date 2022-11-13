@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.Qsci import *
 from event import Event
 from module import Module
+from utils import SaveStatus
 
 
 NAME = "Таббар"
@@ -55,13 +56,10 @@ class Tabbar(Module):
 
         answer = self.ask_for_save()
 
-        if answer == QMessageBox.Save:
-            status = self.core.save_file(buffer)
-            if not status:
-                return
-        elif answer == QMessageBox.Discard:
-            pass
-        else:
+        if answer == QMessageBox.Cancel or (
+            answer == QMessageBox.Save
+            and self.core.save_file(buffer, raise_event=False) == SaveStatus.CANCELED
+        ):
             return
 
         self.remove_tab_and_buffer(idx)

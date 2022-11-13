@@ -1,4 +1,5 @@
 from enum import Enum
+import charset_normalizer
 
 DEFAULT_EMPTY_BUFFER_NAME = "Безымянный"
 
@@ -7,9 +8,17 @@ DEFAULT_EMPTY_BUFFER_NAME = "Безымянный"
 Sync = Enum("Sync", ["FROM_FILE", "TO_FILE"])
 
 
-class NoSyncFileError(Exception):
+class BufferException:
+    """Класс всех исключений, связанных с буферами"""
+
+
+class NoSyncFileError(BufferException):
     """Исключение, вызываемое при попытке синхронизировать текстовый буфер с не
     указанным файлом синхронизации"""
+
+
+class EncodingGuessError(BufferException):
+    """Исключение, вызываемое при неудачной попытке определить кодировку файла"""
 
 
 class Buffer:
@@ -32,16 +41,22 @@ class Buffer:
 
         self.empty_name = empty_name
         self.text = text
-        self.sync_file = sync_file
+        self.file = None
+        self.file_encoding = None
         self.synchronized = sync_file is not None
 
         self.refresh_name()
 
         if sync_file is not None:
+            self.set_sync_file(sync_file)
             self.sync(Sync.FROM_FILE)
 
     def __str__(self):
         return f"{self.__class__.__name__}(name='{self.name}', synchronized={self.synchronized})"
+
+    def set_sync_file(self, file):
+        self.file = file
+        self.file_encoding = self.determine_encoding()
 
     def set_text(self, text):
         """Устанавливает текст буфера"""
@@ -49,12 +64,28 @@ class Buffer:
         self.text = text
         self.desync()
 
+    def determine_encoding(self):
+        """Пытается определить кодировку привязанного к буферу файла
+        сихнронизации. Вызывает исключение NoSyncFileError, если файл для
+        синхронизации не установлен"""
+
+        if self.file is None:
+            raise NoSyncFileError
+
+        guess = charset_normalizer.from_path(self.file).best()
+
+        if guess is None:
+            return None
+
+        return guess.encoding
+
     def sync(self, kind=Sync.TO_FILE):
         """Синхронизирует текст буфера с файлом (kind=Sync.TO_FILE), либо
         содержимое файла с буфером (kind=Sync.FROM_FILE). Вызывает исключение
-        NoSyncFileError, если файл для синхронизации не установлен"""
+        NoSyncFileError, если файл для синхронизации не установлен или
+        EncodingGuessError, если не удалось определить его кодировку"""
 
-        if self.sync_file is None:
+        if self.file is None:
             raise NoSyncFileError
 
         if kind == Sync.TO_FILE:
@@ -62,7 +93,10 @@ class Buffer:
         else:
             mode = "r"
 
-        file = open(self.sync_file, mode=mode)
+        if self.file_encoding is None:
+            mode += "b"
+
+        file = open(self.file, mode=mode, encoding=self.file_encoding)
 
         if kind == Sync.TO_FILE:
             file.write(self.text)
@@ -89,10 +123,7 @@ class Buffer:
 
     def refresh_name(self):
         """Обновляет имя буфера в соответствии с именем файла синхронизации"""
-
-        self.name = (
-            self.empty_name if self.sync_file is None else self.sync_file.split("/")[-1]
-        )
+        self.name = self.empty_name if self.file is None else self.file.split("/")[-1]
 
 
 class BufManager:
@@ -124,8 +155,9 @@ class BufManager:
 
     def remove(self, gui_link, new_current=None):
         """Удаляет буфер"""
+        del self.buffers[gui_link]
+
         if gui_link != self.current_link:
-            del self.buffers[gui_link]
             return
 
         if new_current is None:
