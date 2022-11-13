@@ -49,17 +49,20 @@ class Tabbar(Module):
         gui_buffer = tabbar.widget(idx)
         buffer = buffers[gui_buffer]
 
-        if not buffer.synchronized:
-            answer = self.ask_for_save()
+        if buffer.synchronized:
+            self.remove_tab_and_buffer(idx)
+            return
 
-            if answer == QMessageBox.Save:
-                status = self.core.save_file(buffer)
-                if not status:
-                    return
-            elif answer == QMessageBox.Discard:
-                pass
-            else:
+        answer = self.ask_for_save()
+
+        if answer == QMessageBox.Save:
+            status = self.core.save_file(buffer)
+            if not status:
                 return
+        elif answer == QMessageBox.Discard:
+            pass
+        else:
+            return
 
         self.remove_tab_and_buffer(idx)
 
