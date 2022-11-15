@@ -1,5 +1,8 @@
 from enum import Enum
+from pathlib import Path
 import charset_normalizer
+
+from utils import FileType
 
 DEFAULT_EMPTY_BUFFER_NAME = "Безымянный"
 
@@ -55,6 +58,7 @@ class Buffer:
         return f"{self.__class__.__name__}(name='{self.name}', synchronized={self.synchronized})"
 
     def set_sync_file(self, file):
+        Path(file).touch()
         self.file = file
         self.file_encoding = self.determine_encoding()
 
@@ -125,6 +129,14 @@ class Buffer:
         """Обновляет имя буфера в соответствии с именем файла синхронизации"""
         self.name = self.empty_name if self.file is None else self.file.split("/")[-1]
 
+    def file_type(self):
+        """Возвращает вариант перечисления FileType в соответствии с расширением
+        прикрепленного к буферу файла синхронизации"""
+        try:
+            return FileType.from_ext(self.file.split(".")[-1])
+        except:
+            return None
+
 
 class BufManager:
     """Менеджер управления текстовыми буферами"""
@@ -178,6 +190,7 @@ class GuiBuffer:
 
     def __init__(self):
         self.buffer = ""
+        self.supports_syntax_highlighting = False
 
     def text_changed(self, func):
         self.text_changed_hook = func()

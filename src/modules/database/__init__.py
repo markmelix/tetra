@@ -7,7 +7,15 @@ import sqlite3
 NAME = "База данных"
 DESCRIPTION = "Сохраняет состояние настроек редактора в базу данных"
 
-DEFAULT_SETTINGS = {}
+DEFAULT_SETTINGS = {
+    "db_file": FileSetting(
+        name="Файл базы данных",
+        description="""В базе данных хранятся все настройки редактора и другая
+информация для лучшего пользовательйского опыта""",
+        value="tetra.db",
+        ext="db",
+    )
+}
 
 CREATE_TABLES_QUERY = """
 CREATE TABLE IF NOT EXISTS modules (
@@ -29,7 +37,7 @@ class Database(Module):
     def connect(self):
         """Устанавливает соединение с базой данных"""
 
-        self.con = sqlite3.connect("database.sqlite")
+        self.con = sqlite3.connect(self.settings["db_file"].get_value())
 
     def create_tables(self):
         """Создает нужные таблицы в базе данных, если они ещё не были созданы"""

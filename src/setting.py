@@ -1,3 +1,8 @@
+from typing import OrderedDict
+
+from PyQt5.QtGui import QColor
+
+
 class Setting:
     """Настройка модуля"""
 
@@ -5,6 +10,9 @@ class Setting:
         self.name = name
         self.description = description
         self.value = value
+
+    def get_value(self):
+        return self.value
 
 
 class IntSetting(Setting):
@@ -14,7 +22,7 @@ class IntSetting(Setting):
         self,
         name=None,
         description="",
-        value=None,
+        value=0,
         min_value=0,
         max_value=9999,
         step=1,
@@ -26,6 +34,26 @@ class IntSetting(Setting):
         self.step = step
 
 
+class BoolSetting(Setting):
+    """Настройка, принимающая в качестве значение True или False"""
+
+    def __init__(self, name=None, description="", value=False):
+        super().__init__(name, description, value)
+
+
+class SellectionSetting(Setting):
+    """Настройка, принимающая в качестве значение один строковый элемент из
+    списка возможных элементов"""
+
+    def __init__(self, name=None, description="", value=None, values=OrderedDict()):
+        super().__init__(name, description, value)
+
+        self.values = values
+
+    def get_value(self):
+        return self.values[self.value]
+
+
 class FileSetting(Setting):
     """Настройка, принимающая в качестве значения путь до файла в файлововй
     системе"""
@@ -34,3 +62,13 @@ class FileSetting(Setting):
         super().__init__(name, description, value)
 
         self.ext = ext
+
+
+class ColorSetting(Setting):
+    """Настройка, принимающая в качестве значения цвет"""
+
+    def __init__(self, name=None, description="", value=None):
+        super().__init__(name, description, value)
+
+    def get_value(self):
+        return QColor(self.value)
