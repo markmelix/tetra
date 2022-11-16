@@ -2,12 +2,31 @@ from PyQt5.QtWidgets import QLabel
 from module import Module
 from event import Event
 from modules.edit_buffer import EOL_WINDOWS
+from setting import BoolSetting, StringSetting
 
 
 NAME = "Статусбар"
 DESCRIPTION = "На статусбаре расположена информация об открытом файле"
 
-DEFAULT_SETTINGS = {}
+DEFAULT_SETTINGS = {
+    "delimiter": StringSetting(
+        name="Разделитель элементов",
+        value=" | ",
+    ),
+    "show_name": BoolSetting(
+        name="Показывать имя буфера",
+        value=True,
+    ),
+    "show_eol": BoolSetting(
+        name="Показывать EOL",
+        description="EOL - конец каждой строки файла, может быть либо LF (\\n), либо CR LF (\\r\\n)",
+        value=True,
+    ),
+    "show_encoding": BoolSetting(
+        name="Показывать кодировку",
+        value=True,
+    ),
+}
 
 TRIGGER_EVENTS = (
     Event.NEW_BUFFER_CREATED,
@@ -33,7 +52,7 @@ class Statusbar(Module):
     def unload(self):
         super().unload()
 
-        self.core.statusBar().clearMessage()
+        self.core.statusBar().removeWidget(self.widget)
 
     def generate(self, buffer):
         """Генерирует и возвращает текст для статусбара"""
@@ -44,14 +63,26 @@ class Statusbar(Module):
             else "/".join(buffer.file.split("/")[-2:])
         )
         eol = self.core.find_module("edit_buffer")["eol_mode"].value
-        eol = " | " + ("CR LF" if eol == EOL_WINDOWS else "LF")
+        eol = "CR LF" if eol == EOL_WINDOWS else "LF"
         encoding = (
-            ""
+            "???"
             if buffer.file_encoding is None
-            else f" | {buffer.file_encoding.replace('_', '-').upper()}"
+            else buffer.file_encoding.replace("_", "-").upper()
         )
 
-        return f"{detailed_name}{eol}{encoding}"
+        comps = (
+            ("show_name", detailed_name),
+            ("show_eol", eol),
+            ("show_encoding", encoding),
+        )
+
+        enabled = []
+
+        for setting, comp in comps:
+            if self[setting].get_value():
+                enabled.append(comp)
+
+        return self["delimiter"].value.join(enabled)
 
     def refresh(self):
         super().refresh()

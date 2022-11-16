@@ -18,6 +18,10 @@ DEFAULT_SETTINGS = {
         name="Подсветка кода",
         value=True,
     ),
+    "line_numbers": BoolSetting(
+        name="Нумерация строк",
+        value=True,
+    ),
     "wrap_mode": SellectionSetting(
         name="Перенос",
         value="Отключен",
@@ -116,6 +120,7 @@ class EnhancedGuiBuffer(QsciScintilla, GuiBuffer):
             self.apply_syntax_highlighting()
 
         assignments = {
+            "line_numbers": self.apply_line_numbers,
             "wrap_mode": self.setWrapMode,
             "wrap_indent_mode": self.setWrapIndentMode,
             "eol_mode": self.setEolMode,
@@ -135,6 +140,14 @@ class EnhancedGuiBuffer(QsciScintilla, GuiBuffer):
 
         self.settings = settings
 
+    def apply_line_numbers(self, yes):
+        if not yes:
+            self.setMarginWidth(1, 0)
+            return
+
+        self.setMarginWidth(1, 35)
+        self.setMarginType(1, QsciScintilla.NumberMargin)
+
     def apply_syntax_highlighting(self):
         if self.buffer is None:
             return
@@ -148,6 +161,7 @@ class EnhancedGuiBuffer(QsciScintilla, GuiBuffer):
             FileType.XML: QsciLexerXML,
             FileType.HTML: QsciLexerHTML,
             FileType.YAML: QsciLexerYAML,
+            FileType.MARKDOWN: QsciLexerMarkdown,
         }
 
         if file_type not in lexers:

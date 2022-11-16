@@ -1,0 +1,19 @@
+appearance:theme_file;assdasd
+edit_buffer:syntax_highlighting;1
+edit_buffer:line_numbers;1
+edit_buffer:wrap_mode;Отключен
+edit_buffer:wrap_indent_mode;Отключен
+edit_buffer:eol_mode;Unix (LF)
+edit_buffer:eol_visibility;0
+edit_buffer:indentation_use_tabs;1
+edit_buffer:indentation_size;4
+edit_buffer:indentation_guides;0
+edit_buffer:tab_indents;1
+edit_buffer:auto_indent;1
+edit_buffer:caret_line_visible;1
+edit_buffer:caret_line_background_color;#1fff0000
+edit_buffer:caret_width;1
+statusbar:delimiter; | 
+statusbar:show_name;1
+statusbar:show_eol;1
+statusbar:show_encoding;1

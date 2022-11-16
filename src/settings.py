@@ -1,6 +1,8 @@
+from sqlite3 import Connection
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QCheckBox,
+    QFileDialog,
     QHBoxLayout,
     QLabel,
     QMainWindow,
@@ -11,6 +13,8 @@ from PyQt5.QtWidgets import (
 )
 from event import Event
 from utils import QHSeparationLine
+
+import csv
 
 
 class ModuleSettings(QWidget):
@@ -32,9 +36,7 @@ class ModuleSettings(QWidget):
         self.state.setText("Включен" if module.enabled else "Выключен")
         self.state.setDisabled(not module.can_disable)
         self.state.setChecked(module.enabled)
-        self.state.stateChanged.connect(
-            lambda state: self.state.setText("Включен" if state else "Выключен")
-        )
+        self.state.stateChanged.connect(self.turn_module)
 
         self.title_layout.addWidget(self.title, 10)
         self.title_layout.addWidget(self.state, 1)
@@ -80,6 +82,10 @@ class ModuleSettings(QWidget):
 
         self.setLayout(self.main_layout)
 
+    def turn_module(self, state):
+        self.state.setText("Включен" if state else "Выключен")
+        self.module.toggle(state)
+
     def reset_setting(self):
         button = self.sender()
 
@@ -106,6 +112,22 @@ class Settings(QMainWindow):
         self.title.setStyleSheet("font-size: 17pt;")
 
         self.layout.addWidget(self.title, alignment=Qt.AlignCenter)
+
+        self.import_button = QPushButton("Импортировать из CSV")
+        self.import_button.clicked.connect(self.import_settings)
+
+        self.export_button = QPushButton("Экспортировать в CSV")
+        self.export_button.clicked.connect(self.export_settings)
+
+        self.port_layout = QHBoxLayout()
+        self.port_layout.addWidget(self.import_button)
+        self.port_layout.addWidget(self.export_button)
+
+        self.port_widget = QWidget()
+        self.port_widget.setLayout(self.port_layout)
+
+        self.layout.addWidget(self.port_widget)
+
         self.layout.addWidget(QHSeparationLine())
 
         for module in filter(
@@ -135,3 +157,44 @@ class Settings(QMainWindow):
     def closeEvent(self, event) -> None:
         self.save()
         event.accept()
+
+    def import_settings(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Импорт файла", "settings.csv", "CSV Файлы (*.csv)", ""
+        )
+
+        if path == "":
+            return
+
+        con = self.core.con
+        cur = con.cursor()
+
+        with open(path, newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";", quotechar="'")
+            for id, value in reader:
+                module = id.split(":")[0]
+                # cur.execute("DELETE FROM settings WHERE id = ?", (id,))
+                cur.execute(
+                    "INSERT OR REPLACE INTO settings (id, module, value) VALUES (?, ?, ?)",
+                    (id, module, value),
+                )
+                cur.execute("UPDATE settings SET value = ? WHERE id = ?", (value, id))
+            con.commit()
+
+        self.core.raise_event(Event.SETTINGS_SAVED)
+        self.close()
+
+    def export_settings(self):
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Экспорт файла", "settings.csv", "CSV Файлы (*.csv)", ""
+        )
+
+        if path == "":
+            return
+
+        cur = self.core.con.cursor()
+
+        with open(path, mode="w", newline="") as csvfile:
+            writer = csv.writer(csvfile, delimiter=";", quotechar="'")
+            rows = cur.execute("SELECT id, value FROM settings").fetchall()
+            writer.writerows(rows)

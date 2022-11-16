@@ -14,6 +14,7 @@ class FileType(Enum):
     XML = auto()
     HTML = auto()
     YAML = auto()
+    MARKDOWN = auto()
 
     @classmethod
     def from_ext(cls, ext):
@@ -27,6 +28,7 @@ class FileType(Enum):
             "xml": cls.XML,
             "html": cls.HTML,
             "yaml": cls.YAML,
+            "md": cls.MARKDOWN,
         }
 
         return assignments[ext] if ext in assignments else cls.UNKNOWN

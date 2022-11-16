@@ -155,11 +155,7 @@ class Core(QMainWindow):
     def open_file(self):
         """Открывает существующий файл"""
 
-        options = QFileDialog.Options()
-
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Открыть файл", "", "", "", options=options
-        )
+        path, _ = QFileDialog.getOpenFileName(self, "Открыть файл", "", "", "")
 
         if path == "":
             return

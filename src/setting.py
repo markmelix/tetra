@@ -22,6 +22,20 @@ class Setting:
         return self.value
 
 
+class StringSetting(Setting):
+    """Настройка, принимающая в качестве значения строку"""
+
+    def __init__(self, name=None, description="", value=None):
+        super().__init__(name, description, value)
+
+    def widget(self):
+        widget = QLineEdit()
+        widget.setText(self.value)
+        widget.textChanged.connect(self.set_value)
+        widget.set_value = lambda v: widget.setText(v)
+        return widget
+
+
 class IntSetting(Setting):
     """Настройка, принимающая в качестве значения целое число"""
 

@@ -34,6 +34,13 @@ class Module:
         """Возвращает состояние модуля (загружен в программу или нет)"""
         return self.loaded
 
+    def toggle(self, state):
+        """Включает модуль, если state - True, иначе выключает"""
+        if state:
+            self.enable()
+        else:
+            self.disable()
+
     def disable(self):
         """Выключает и выгружает модуль"""
         self.enabled = False
