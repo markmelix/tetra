@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
 from event import Event
 from utils import QHSeparationLine
 
+import pandas as pd
 import csv
 
 
@@ -166,20 +167,11 @@ class Settings(QMainWindow):
         if path == "":
             return
 
-        con = self.core.con
-        cur = con.cursor()
-
-        with open(path, newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter=";", quotechar="'")
-            for id, value in reader:
-                module = id.split(":")[0]
-                # cur.execute("DELETE FROM settings WHERE id = ?", (id,))
-                cur.execute(
-                    "INSERT OR REPLACE INTO settings (id, module, value) VALUES (?, ?, ?)",
-                    (id, module, value),
-                )
-                cur.execute("UPDATE settings SET value = ? WHERE id = ?", (value, id))
-            con.commit()
+        pd.read_csv(path, sep=";").to_sql(
+            "settings", self.core.con, if_exists="replace", index=False
+        )
+        for module in self.core.modules.values():
+            module.load_settings()
 
         self.core.raise_event(Event.SETTINGS_SAVED)
         self.close()
@@ -195,6 +187,7 @@ class Settings(QMainWindow):
         cur = self.core.con.cursor()
 
         with open(path, mode="w", newline="") as csvfile:
-            writer = csv.writer(csvfile, delimiter=";", quotechar="'")
-            rows = cur.execute("SELECT id, value FROM settings").fetchall()
+            writer = csv.writer(csvfile, delimiter=";", quotechar='"')
+            rows = cur.execute("SELECT id, module, value FROM settings").fetchall()
+            writer.writerow(("id", "module", "value"))
             writer.writerows(rows)

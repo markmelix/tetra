@@ -57,6 +57,9 @@ class IntSetting(Setting):
     def set_value(self, value):
         self.value = int(value)
 
+    def get_value(self):
+        return int(self.value)
+
     def widget(self):
         widget = EnhancedQSpinBox()
 
@@ -64,7 +67,7 @@ class IntSetting(Setting):
         widget.setMinimum(self.min_value)
         widget.setMaximum(self.max_value)
         widget.setSingleStep(self.step)
-        widget.setValue(self.value)
+        widget.setValue(self.get_value())
 
         widget.textChanged.connect(self.set_value)
         widget.set_value = lambda v: widget.setValue(v)
@@ -81,9 +84,12 @@ class BoolSetting(Setting):
     def set_value(self, value):
         self.value = bool(int(value))
 
+    def get_value(self):
+        return bool(int(self.value))
+
     def widget(self):
         widget = QCheckBox()
-        widget.setChecked(self.value)
+        widget.setChecked(self.get_value())
         widget.setText("Включен" if self.value else "Выключен")
         widget.stateChanged.connect(
             lambda state: widget.setText("Включен" if state else "Выключен")
