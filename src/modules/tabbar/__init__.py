@@ -50,8 +50,6 @@ class Tabbar(Module):
         gui_buffer = tabbar.widget(idx)
         buffer = buffers[gui_buffer]
 
-        self.sync_buffer(gui_buffer)
-
         if buffer.is_empty() or buffer.synchronized:
             self.remove_tab_and_buffer(idx)
             return
