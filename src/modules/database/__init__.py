@@ -63,21 +63,6 @@ class Database(Module):
                     "INSERT OR IGNORE INTO settings VALUES (?,?,?)", (id, module, value)
                 )
 
-            module_load_settings(mod)
-
-        def update_enabled_state(mod, state):
-            cur.execute("UPDATE modules SET enabled=? WHERE id=?", (state, mod.id))
-            con.commit()
-
-        def module_enable(mod, *args, **kwargs):
-            Module._Module__enable(mod, *args, **kwargs)
-            update_enabled_state(mod, True)
-
-        def module_disable(mod, *args, **kwargs):
-            Module._Module__disable(mod, *args, **kwargs)
-            update_enabled_state(mod, False)
-
-        def module_load_settings(mod):
             def row_to_setting(row):
                 id, value = row
                 id = id.split(":")[-1]
@@ -97,19 +82,30 @@ class Database(Module):
 
             con.commit()
 
+        def update_enabled_state(mod, state):
+            cur.execute("UPDATE modules SET enabled=? WHERE id=?", (state, mod.id))
+            con.commit()
+
+        def module_enable(mod, *args, **kwargs):
+            Module._Module__enable(mod, *args, **kwargs)
+            update_enabled_state(mod, True)
+
+        def module_disable(mod, *args, **kwargs):
+            Module._Module__disable(mod, *args, **kwargs)
+            update_enabled_state(mod, False)
+
         def module_save_settings(mod):
             """Сохраняет настройки модуля в базу данных"""
             for id, setting in mod.settings.items():
                 cur.execute(
                     "UPDATE settings SET value=? WHERE id=?",
                     (setting.value, f"{mod.id}:{id}"),
-                ).fetchall()
+                )
                 con.commit()
 
         Module.__init__ = module_init
         Module.enable = module_enable
         Module.disable = module_disable
-        Module.load_settings = module_load_settings
         Module.save_settings = module_save_settings
 
         self.core.con = self.con

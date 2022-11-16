@@ -23,6 +23,8 @@ class Appearance(Module):
         try:
             with open(self.theme_file, mode="r") as theme_file:
                 self.core.setStyleSheet(theme_file.read())
+        except TypeError:
+            pass
         except FileNotFoundError:
             pass
 

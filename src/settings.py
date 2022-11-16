@@ -167,11 +167,14 @@ class Settings(QMainWindow):
         if path == "":
             return
 
-        pd.read_csv(path, sep=";").to_sql(
-            "settings", self.core.con, if_exists="replace", index=False
-        )
-        for module in self.core.modules.values():
-            module.load_settings()
+        modules = self.core.modules
+
+        with open(path, newline="") as csvfile:
+            reader = csv.reader(csvfile, delimiter=";", quotechar="'")
+            for id, value in reader:
+                module = id.split(":")[0]
+                id = id.split(":")[-1]
+                modules[module][id].value = value
 
         self.core.raise_event(Event.SETTINGS_SAVED)
         self.close()
@@ -188,6 +191,5 @@ class Settings(QMainWindow):
 
         with open(path, mode="w", newline="") as csvfile:
             writer = csv.writer(csvfile, delimiter=";", quotechar='"')
-            rows = cur.execute("SELECT id, module, value FROM settings").fetchall()
-            writer.writerow(("id", "module", "value"))
+            rows = cur.execute("SELECT id, value FROM settings").fetchall()
             writer.writerows(rows)
