@@ -8,7 +8,7 @@ from settings import Settings
 from utils import SaveStatus
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 
 class Core(QMainWindow):
@@ -172,3 +172,9 @@ class Core(QMainWindow):
     @apply_event(Event.ABOUT_DIALOG_OPENED)
     def open_about_dialog(self):
         """Открывает окно "О программе" """
+
+        QMessageBox.about(
+            self,
+            "Tetra Code Editor",
+            "Модульный редактор кода с графическим интерфейсом.\nАвтор: Меликсетян Марк.",
+        )
