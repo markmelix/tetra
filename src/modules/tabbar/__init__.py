@@ -50,7 +50,9 @@ class Tabbar(Module):
         gui_buffer = tabbar.widget(idx)
         buffer = buffers[gui_buffer]
 
-        if buffer.synchronized:
+        self.sync_buffer(gui_buffer)
+
+        if buffer.is_empty() or buffer.synchronized:
             self.remove_tab_and_buffer(idx)
             return
 
@@ -76,12 +78,16 @@ class Tabbar(Module):
     def unload(self):
         super().unload()
 
-    def sync_buffer(self):
+    def sync_buffer(self, gui_buffer=None):
         core = self.core
         buffers = core.buffers
-        current_link, current = buffers.current_link, buffers.current()
 
-        current.set_text(current_link.get_text())
+        if gui_buffer is None:
+            gui_buffer, abs_buffer = buffers.current_link, buffers.current()
+        else:
+            abs_buffer = buffers[gui_buffer]
+
+        abs_buffer.set_text(gui_buffer.get_text())
 
         if core.last_event() != Event.FILE_OPENED:
             core.raise_event(Event.BUFFER_TEXT_CHANGED)

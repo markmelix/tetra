@@ -17,6 +17,8 @@ Event = Enum(
         "ABOUT_DIALOG_OPENED",
         "BUFFER_TEXT_CHANGED",
         "TAB_CLOSED",
+        "SETTINGS_SAVED",
+        "SETTING_CHANGED",
     ],
 )
 
@@ -29,8 +31,9 @@ EVENT_DESCRIPTIONS = {
     "SETTINGS_OPENED": "Открыто окно настроек",
     "ABOUT_DIALOG_OPENED": 'Открыто окно "О программе"',
     "BUFFER_TEXT_CHANGED": "Изменен текст буфера редактирования",
-    "NEW_TAB_CREATED": "Создана новая вкладка в таббаре",
     "TAB_CLOSED": "Вкладка с буфером закрыта",
+    "SETTINGS_SAVED": "Настройки сохранены",
+    "SETTING_CHANGED": "Какая-то из настроек была изменена",
 }
 
 

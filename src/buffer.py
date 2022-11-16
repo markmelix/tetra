@@ -137,6 +137,11 @@ class Buffer:
         except:
             return None
 
+    def is_empty(self):
+        """Возвращает True, если буфер не имеет прикрепленного файла и является
+        пустым, иначе - False"""
+        return self.name == self.empty_name and self.text == ""
+
 
 class BufManager:
     """Менеджер управления текстовыми буферами"""

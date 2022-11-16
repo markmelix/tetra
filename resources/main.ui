@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Tetra Code Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="global_layout_widget" native="true">

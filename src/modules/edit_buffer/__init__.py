@@ -166,7 +166,10 @@ class EnhancedGuiBuffer(QsciScintilla, GuiBuffer):
         return self.text()
 
     def refresh(self, settings, event, buffer=None):
-        if self.settings != settings:
+        if (
+            event in {Event.SETTING_CHANGED, Event.SETTINGS_SAVED}
+            or self.settings != settings
+        ):
             self.apply_settings(settings)
 
         if self.buffer is not buffer:
@@ -191,7 +194,7 @@ class EditBuffer(Module):
     def unload(self):
         super().unload()
 
-        self.core.gui_buffer_instance = self.core._Editor__gui_buffer_instance
+        self.core.gui_buffer_instance = self.core._Core__gui_buffer_instance
 
     def refresh(self):
         super().refresh()
