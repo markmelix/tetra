@@ -46,6 +46,7 @@ class Buffer:
         self.text = text
         self.file = None
         self.file_encoding = None
+        self.full_encoding = None
         self.synchronized = sync_file is not None
 
         self.refresh_name()

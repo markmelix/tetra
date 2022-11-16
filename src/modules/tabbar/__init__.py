@@ -64,11 +64,21 @@ class Tabbar(Module):
 
         self.remove_tab_and_buffer(idx)
 
+    def change_current(self, idx):
+        # return
+        buffers = self.core.buffers
+        tabbar = self.core.tabbar
+        gui_buffer = tabbar.widget(idx)
+        # buffer = buffers[gui_buffer]
+        buffers.current_link = gui_buffer
+        self.core.raise_event(Event.TAB_CHANGED)
+
     def load(self):
         super().load()
 
         tabbar = self.core.tabbar
 
+        tabbar.currentChanged.connect(self.change_current)
         tabbar.tabCloseRequested.connect(self.close_tab)
 
         self.refresh()

@@ -82,6 +82,10 @@ class Core(QMainWindow):
         for module in filter(Module.is_loaded, self.modules.values()):
             module.refresh()
 
+    def find_module(self, id):
+        """Возвращает модуль с заданным id"""
+        return self.modules[id]
+
     def closeEvent(self, event):
         """Делает то, что нужно сделать перед закрытием программы"""
 

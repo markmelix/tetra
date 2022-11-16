@@ -10,6 +10,9 @@ from setting import *
 NAME = "Буфер редактирования"
 DESCRIPTION = "В буфере редактирования происходит редактирование файлов"
 
+EOL_UNIX = "Unix (LF)"
+EOL_WINDOWS = "Windows (CR LF)"
+
 DEFAULT_SETTINGS = {
     "syntax_highlighting": BoolSetting(
         name="Подсветка кода",
@@ -40,12 +43,11 @@ DEFAULT_SETTINGS = {
     "eol_mode": SellectionSetting(
         name="Режим EOL",
         description="Определяет конец каждой строки",
-        value="Unix (LF | \\n)",
+        value=EOL_UNIX,
         values=OrderedDict(
             [
-                ("Unix (LF | \\n)", QsciScintilla.EolUnix),
-                ("Windows (CR LF | \\r\\n)", QsciScintilla.EolWindows),
-                ("Mac (LF | \\n)", QsciScintilla.EolMac),
+                (EOL_UNIX, QsciScintilla.EolUnix),
+                (EOL_WINDOWS, QsciScintilla.EolWindows),
             ]
         ),
     ),
