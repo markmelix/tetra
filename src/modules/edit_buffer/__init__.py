@@ -16,6 +16,7 @@ EOL_WINDOWS = "Windows (CR LF)"
 DEFAULT_SETTINGS = {
     "syntax_highlighting": BoolSetting(
         name="Подсветка кода",
+        description="После отключения данной настройки необходим перезапуск редактора",
         value=True,
     ),
     "line_numbers": BoolSetting(
