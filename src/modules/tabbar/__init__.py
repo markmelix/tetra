@@ -141,5 +141,6 @@ class Tabbar(Module):
             Event.BUFFER_TEXT_CHANGED,
             Event.FILE_SAVED_AS,
             Event.FILE_SAVED,
+            Event.TAB_CHANGED,
         }:
             self.highlight_desynced()

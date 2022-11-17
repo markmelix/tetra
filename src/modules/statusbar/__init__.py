@@ -92,5 +92,8 @@ class Statusbar(Module):
         if core.last_event() not in TRIGGER_EVENTS:
             return
 
-        info = self.generate(core.buffers.current())
-        self.widget.setText(info)
+        try:
+            info = self.generate(core.buffers.current())
+            self.widget.setText(info)
+        except KeyError:
+            pass
