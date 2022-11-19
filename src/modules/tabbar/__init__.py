@@ -133,7 +133,12 @@ class Tabbar(Module):
         if event == Event.FILE_SAVED_AS:
             tabbar.setTabText(tabbar.currentIndex(), core.buffers.current().name)
 
-        if event in {Event.FILE_OPENED, Event.FILE_SAVED_AS, Event.FILE_SAVED}:
+        if event in {
+            Event.FILE_OPENED,
+            Event.FILE_SAVED_AS,
+            Event.FILE_SAVED,
+            Event.TAB_CHANGED,
+        }:
             core.buffers.current()._sync()
 
         if event in {
