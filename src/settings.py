@@ -1,4 +1,3 @@
-from sqlite3 import Connection
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QCheckBox,
@@ -159,6 +158,8 @@ class Settings(QMainWindow):
         event.accept()
 
     def import_settings(self):
+        self.save()
+
         path, _ = QFileDialog.getOpenFileName(
             self, "Импорт файла", "settings.csv", "CSV Файлы (*.csv)", ""
         )
@@ -179,6 +180,8 @@ class Settings(QMainWindow):
         self.close()
 
     def export_settings(self):
+        self.save()
+
         path, _ = QFileDialog.getSaveFileName(
             self, "Экспорт файла", "settings.csv", "CSV Файлы (*.csv)", ""
         )
