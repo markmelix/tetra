@@ -14,7 +14,6 @@ from PyQt5.QtWidgets import (
 from event import Event
 from utils import QHSeparationLine
 
-import pandas as pd
 import csv
 
 
