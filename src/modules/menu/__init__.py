@@ -1,4 +1,3 @@
-from PyQt5.QtWidgets import QAction
 from module import Module
 
 NAME = "Меню"
