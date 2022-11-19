@@ -5,13 +5,14 @@ from modules import MODULES
 from event import Event, apply_event
 from module import Module
 from settings import Settings
+from ui import Ui_MainWindow
 from utils import SaveStatus
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 
-class Core(QMainWindow):
+class Core(QMainWindow, Ui_MainWindow):
     """Ядро редактора, собирающее все компоненты программы в единую систему"""
 
     def __init__(self):
@@ -46,7 +47,7 @@ class Core(QMainWindow):
 
     def init_ui(self):
         """Инициализирует пользовательский интерфейс редактора"""
-        uic.loadUi("resources/main.ui", self)
+        self.setupUi(self)
         self.setCentralWidget(self.global_layout_widget)
 
     def init_module(self, module):
