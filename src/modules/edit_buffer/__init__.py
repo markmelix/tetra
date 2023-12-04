@@ -7,47 +7,47 @@ from event import Event
 from setting import *
 
 
-NAME = "Буфер редактирования"
-DESCRIPTION = "В буфере редактирования происходит редактирование файлов"
+NAME = "Editing buffer"
+DESCRIPTION = "File editing goes there"
 
 EOL_UNIX = "Unix (LF)"
 EOL_WINDOWS = "Windows (CR LF)"
 
 DEFAULT_SETTINGS = {
     "syntax_highlighting": BoolSetting(
-        name="Подсветка кода",
-        description="После отключения данной настройки необходим перезапуск редактора",
+        name="Syntax highlighting",
+        description="After disabling this setting it's required to restart the editor",
         value=True,
     ),
     "line_numbers": BoolSetting(
-        name="Нумерация строк",
+        name="Line numbers",
         value=True,
     ),
     "wrap_mode": SellectionSetting(
-        name="Перенос",
-        value="Отключен",
+        name="Wrap",
+        value="Off",
         values=OrderedDict(
             [
-                ("Отключен", QsciScintilla.WrapNone),
-                ("По словам", QsciScintilla.WrapWord),
-                ("По символам", QsciScintilla.WrapCharacter),
-                ("По пробелам", QsciScintilla.WrapWhitespace),
+                ("Off", QsciScintilla.WrapNone),
+                ("By words", QsciScintilla.WrapWord),
+                ("By characters", QsciScintilla.WrapCharacter),
+                ("By spaces", QsciScintilla.WrapWhitespace),
             ]
         ),
     ),
     "wrap_indent_mode": SellectionSetting(
-        name="Отступ при переносе",
-        value="Отключен",
+        name="Wrap indentation",
+        value="Off",
         values=OrderedDict(
             [
-                ("Отключен", QsciScintilla.WrapIndentSame),
-                ("Включен", QsciScintilla.WrapWord),
+                ("Off", QsciScintilla.WrapIndentSame),
+                ("On", QsciScintilla.WrapWord),
             ]
         ),
     ),
     "eol_mode": SellectionSetting(
-        name="Режим EOL",
-        description="Определяет конец каждой строки",
+        name="EOL mode",
+        description="Determines the end of each line",
         value=EOL_UNIX,
         values=OrderedDict(
             [
@@ -57,58 +57,52 @@ DEFAULT_SETTINGS = {
         ),
     ),
     "eol_visibility": BoolSetting(
-        name="Видимость EOL",
-        description="При включении данной настройки в конце каждой строки будет индикатор ее конца",
+        name="EOL visibility",
+        description="Shows end-of-line indicator at the end of each line",
         value=False,
     ),
     "indentation_use_tabs": BoolSetting(
-        name="Использовать табы вместо пробелов",
+        name="Use tabs instead of spaces",
         value=True,
     ),
     "indentation_size": IntSetting(
-        name="Размер отступа",
+        name="Indent size",
         value=4,
         min_value=1,
     ),
     "indentation_guides": BoolSetting(
-        name="Линии отступов",
-        description="Показывать пунктирные вертикальные линии для обозначения уровней отступов",
+        name="Indent guidelines",
+        description="Whether to show stripped vertical lines to show indentation levels",
         value=False,
     ),
     "tab_indents": BoolSetting(
-        name="Выравнивать отступ на пробелах",
-        description="""Влияет на поведение клавиши TAB, когда курсор окружен
-пробелами. В выключенном состоянии данной настройки, редактор просто вставляет n
-символов отступа (пробелы или табы) при нажатии клавиши TAB. Но если настройка
-включена, редактор перемещает первый не пробельный символ на следующий уровень
-отступа.""",
+        name="Align space indent",
+        description="""Specifies behaviour of the TAB key when the cursor is surrounded by spaces. When turned off, the editor just inserts n indent characters (spaces or tabs) on TAB tap. But, if the setting is on, the editor moves first no-space character on the next indentaion level.""",
         value=True,
     ),
     "auto_indent": BoolSetting(
-        name="Автоматический отступ",
-        description="""При вставке новой строки автоматический отступ перемещает
-курсор на тот же уровень отступа, что и предыдущая строка. Данная настройка
-может быть игнорирована при влюченной подсветке кода""",
+        name="Automatic indent",
+        description="""When inserting new line, automatic indent moves the cursor to the same indentation level where the previous line was. This setting may be ignored with syntax highlighting turned on.""",
         value=True,
     ),
     "caret_line_visible": BoolSetting(
-        name="Подсветка строки, на которой расположен курсор",
+        name="Highlight a line where the cursor is",
         value=True,
     ),
     "caret_line_background_color": ColorSetting(
-        name="Цвет подсвеченной строки",
+        name="Highlighted line color",
         value="#1fff0000",
     ),
     "caret_width": IntSetting(
-        name="Ширина курсора",
-        description="Ширина курсора в пикселях. Ширина равная нулю делает курсор невидимым!",
+        name="Cursor width",
+        description="Cursor width in pixels. A zero one makes the cursor invisible!",
         value=1,
     ),
 }
 
 
 class EnhancedGuiBuffer(QsciScintilla, GuiBuffer):
-    """Усовершенствованный графический буфер редактирования"""
+    """Enhanced graphical text-editing buffer"""
 
     def __init__(self, settings, buffer=None):
         super().__init__()

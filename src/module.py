@@ -2,8 +2,8 @@ from copy import deepcopy
 
 
 class Module:
-    """Модуль программы, или, иными словами, настраиваемый компонент программы с
-    минимальным дополняющим функционалом"""
+    """A program module or, in other words, configurable component of the
+    program with minimal additional functionality"""
 
     def __init__(self, name, description, default_settings, core, can_disable=True):
         self.name = name
@@ -18,64 +18,63 @@ class Module:
         self.enabled = True
         self.loaded = False
 
-    # Подобные приватные переменные нужны, чтобы можно было переопределять
-    # методы класса без бесконечных рекурсий.
+    # These private variables are needed to redefine class methods without
+    # infinite recursions
     __init = __init__
 
     def set(self, setting_id, new_value):
-        """Устанавливает новое значение настройки с заданным идентификатором"""
+        """Sets the new setting value with the provided identifier"""
         self.settings[setting_id].value = new_value
 
     def __getitem__(self, setting_id):
-        """Возвращает настройку с данным идентификатором"""
+        """Returns the settings with the provided identifier"""
         return self.settings[setting_id]
 
     def is_loaded(self):
-        """Возвращает состояние модуля (загружен в программу или нет)"""
+        """Returns the state of the module (whether it's loaded into the program)"""
         return self.loaded
 
     def toggle(self, state):
-        """Включает модуль, если state - True, иначе выключает"""
+        """Enables the module if state's True, else disables it"""
         if state:
             self.enable()
         else:
             self.disable()
 
     def disable(self):
-        """Выключает и выгружает модуль"""
+        """Disables and unloads the module"""
         self.enabled = False
         self.unload()
 
     __disable = disable
 
     def enable(self):
-        """Включает и загружает модуль"""
+        """Enables and loads the module"""
         self.enabled = True
         self.load()
 
     __enable = enable
 
     def load_if_enabled(self):
-        """Загружает модуль при условии, что он включен"""
+        """Loads the module with the condition that it's enabled"""
         if self.enabled:
             self.load()
 
     def load(self):
-        """Загружает модуль в программу"""
+        """Loads the module into the program"""
         self.loaded = True
 
     __load = load
 
     def unload(self):
-        """Выгружает модуль из программы"""
+        """Unloads the module into the program"""
         self.loaded = False
 
     __unload = unload
 
     def refresh(self):
-        """Обновляет модуль. Полезно вызывать данный метод после вызова
-        какого-либо события в программе, чтобы обновить состояние модуля в
-        соответствии с этим событием"""
+        """Refreshes the module. It's useful to call that method after an event
+        raise to refresh the state of the module according to that event"""
         pass
 
     __refresh = refresh

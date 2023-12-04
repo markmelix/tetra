@@ -6,8 +6,8 @@ from module import Module
 from utils import SaveStatus
 
 
-NAME = "Таббар"
-DESCRIPTION = "Таббар позволяет переключаться между буферами"
+NAME = "Tabbar"
+DESCRIPTION = "Tabbar makes it able to switch tabs with buffer"
 
 DEFAULT_SETTINGS = {}
 
@@ -19,8 +19,8 @@ class Tabbar(Module):
     def ask_for_save(self):
         dialog = QMessageBox()
         dialog.setIcon(QMessageBox.Question)
-        dialog.setText("Файл был изменен.")
-        dialog.setInformativeText("Сохранить изменения?")
+        dialog.setText("File was changed.")
+        dialog.setInformativeText("Save changes?")
         dialog.setStandardButtons(
             QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
         )

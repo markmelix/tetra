@@ -1,11 +1,9 @@
-"""События уведомляют компоненты редактора о том, что произошло в данный момент
-времени. Обработка событий позволяет разным компонентам (модулям) программы
-управлять ее состоянием в зависимости от того, что сделал пользователь"""
+"""Event-handling allows different components (modules) of the program to
+control its state depending on what the user done"""
 
 from enum import Enum
 
 
-# Перечисление возможных событий
 Event = Enum(
     "Event",
     [
@@ -23,31 +21,28 @@ Event = Enum(
     ],
 )
 
-# Словарь описания возможных событий
 EVENT_DESCRIPTIONS = {
-    "NEW_BUFFER_CREATED": "Создан новый буфер",
-    "FILE_SAVED": "Файл был сохранен",
-    "FILE_SAVED_AS": "Файл был сохранен как",
-    "FILE_OPENED": "Открыт файл",
-    "SETTINGS_OPENED": "Открыто окно настроек",
-    "ABOUT_DIALOG_OPENED": 'Открыто окно "О программе"',
-    "BUFFER_TEXT_CHANGED": "Изменен текст буфера редактирования",
-    "TAB_CHANGED": "Выбрана другая вкладка с буфером",
-    "TAB_CLOSED": "Вкладка с буфером закрыта",
-    "SETTINGS_SAVED": "Настройки сохранены",
-    "SETTING_CHANGED": "Какая-то из настроек была изменена",
+    "NEW_BUFFER_CREATED": "New buffer was created",
+    "FILE_SAVED": "File was saved",
+    "FILE_SAVED_AS": "File was saved as",
+    "FILE_OPENED": "File was open",
+    "SETTINGS_OPENED": "Settings window was opened",
+    "ABOUT_DIALOG_OPENED": "About dialogue window was opened",
+    "BUFFER_TEXT_CHANGED": "Editing buffer text was changed",
+    "TAB_CHANGED": "A tab was changed",
+    "TAB_CLOSED": "Tab was closed",
+    "SETTINGS_SAVED": "Settings were saved",
+    "SETTING_CHANGED": "Some of the setting were changed",
 }
 
 
 def describe_event(event):
-    """Возвращает описание переданного события"""
-
     return EVENT_DESCRIPTIONS[event.name]
 
 
 def apply_event(event):
-    """Применяет событие на метод ядра программы. Иными словами, вызывает
-    событие после выполнения кода метода"""
+    """Decorator which applies an event on the program method. In other words,
+    calls event after some code execution."""
 
     def wrapper(func):
         def wrapped_func(*args, **kwargs):

@@ -1,7 +1,7 @@
 from module import Module
 
-NAME = "Меню"
-DESCRIPTION = "Делает кнопки меню функциональными"
+NAME = "Menu"
+DESCRIPTION = "Makes menu buttons functional"
 
 DEFAULT_SETTINGS = {}
 

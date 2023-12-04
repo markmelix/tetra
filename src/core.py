@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 
 class Core(QMainWindow, Ui_MainWindow):
-    """Ядро редактора, собирающее все компоненты программы в единую систему"""
+    """The core of the editor collecting all the components of a program to the whole system."""
 
     def __init__(self):
         super().__init__()
@@ -26,32 +26,25 @@ class Core(QMainWindow, Ui_MainWindow):
         self.init_buffer_manager()
 
     def init_event_system(self):
-        """Инициализирует систему событий"""
-
         self.events = []
 
     def last_event(self):
-        """Возвращает последнее вызванное событие"""
-
         try:
             return self.events[-1]
         except IndexError:
             return None
 
     def init_buffer_manager(self):
-        """Инициализирует систему управления буферами редактора"""
-
         self.buffers = BufManager()
         self.buffers.add_empty(self.gui_buffer_instance())
         self.raise_event(Event.NEW_BUFFER_CREATED)
 
     def init_ui(self):
-        """Инициализирует пользовательский интерфейс редактора"""
         self.setupUi(self)
         self.setCentralWidget(self.global_layout_widget)
 
     def init_module(self, module):
-        """Инициализирует встроенный модуль редактора"""
+        """Initializes an editor module"""
 
         # Трансформировать название_модуля в НазваниеМодуля
         module_class = "".join(word.title() for word in module.split("_"))
@@ -59,7 +52,7 @@ class Core(QMainWindow, Ui_MainWindow):
         return eval(f"modules.{module}.{module_class}(self)")
 
     def init_modules(self):
-        """Инициализирует встроенные в редактор модули"""
+        """Initializes all editor modules"""
 
         for module in MODULES:
             mod = self.init_module(module)
@@ -72,47 +65,44 @@ class Core(QMainWindow, Ui_MainWindow):
             self.modules[module] = mod
 
     def unload_modules(self):
-        """Выгружает встроенные в редактор модули"""
+        """Unloads the inner editor modules"""
 
         for module in filter(Module.is_loaded, self.modules.values()):
             module.unload()
 
     def refresh_modules(self):
-        """Обновляет состояние встроенных в редактор модулей"""
+        """Refresh states of the inner editor modules"""
 
         for module in filter(Module.is_loaded, self.modules.values()):
             module.refresh()
 
     def find_module(self, id):
-        """Возвращает модуль с заданным id"""
+        """Returns a module with the passed identifier"""
+
         return self.modules[id]
 
     def closeEvent(self, event):
-        """Делает то, что нужно сделать перед закрытием программы"""
+        """Hook which gets ran when the program's being closed"""
 
         self.unload_modules()
         event.accept()
 
     def raise_event(self, event):
-        """Вызывает событие"""
-
         self.events.append(event)
         self.refresh_modules()
 
     def gui_buffer_instance(self):
-        """Создает и возвращает пустой графический буфер редактирования"""
+        """Creates and returns empty GUI editing buffer"""
         return GuiBuffer()
 
     __gui_buffer_instance = gui_buffer_instance
 
     @apply_event(Event.NEW_BUFFER_CREATED)
     def create_new_file(self):
-        """Создает новый файл"""
-
         self.buffers.add_empty(self.gui_buffer_instance())
 
     def save_file(self, buffer=None, raise_event=True):
-        """Сохраняет открытый файл"""
+        """Saves opened file"""
 
         if buffer is None:
             buffer = self.buffers.current()
@@ -129,7 +119,7 @@ class Core(QMainWindow, Ui_MainWindow):
         return status
 
     def save_file_as(self, buffer=None, raise_event=True):
-        """Сохраняет открытый файл как"""
+        """Saves opened file as"""
 
         options = QFileDialog.Options()
 
@@ -154,7 +144,7 @@ class Core(QMainWindow, Ui_MainWindow):
 
     @apply_event(Event.FILE_OPENED)
     def open_file(self):
-        """Открывает существующий файл"""
+        """Opens existing file"""
 
         path, _ = QFileDialog.getOpenFileName(self, "Открыть файл", "", "", "")
 
@@ -165,17 +155,17 @@ class Core(QMainWindow, Ui_MainWindow):
 
     @apply_event(Event.SETTINGS_OPENED)
     def open_settings(self):
-        """Открывает окно настроек редактора"""
+        """Opens editor's settings dialogue window"""
 
         self.settings = Settings(self)
         self.settings.show()
 
     @apply_event(Event.ABOUT_DIALOG_OPENED)
     def open_about_dialog(self):
-        """Открывает окно "О программе" """
+        """Opens "about" dialogue window"""
 
         QMessageBox.about(
             self,
             "Tetra Code Editor",
-            "Модульный редактор кода с графическим интерфейсом.\nАвтор: Меликсетян Марк.",
+            "Simple modular graphical code editor. Author: Mark Meliksetyan",
         )

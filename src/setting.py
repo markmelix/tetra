@@ -8,7 +8,7 @@ from utils import EnhancedQComboBox, EnhancedQSpinBox
 
 
 class Setting:
-    """Настройка модуля"""
+    """A module setting"""
 
     def __init__(self, name, description="", value=None):
         self.name = name
@@ -23,8 +23,6 @@ class Setting:
 
 
 class StringSetting(Setting):
-    """Настройка, принимающая в качестве значения строку"""
-
     def __init__(self, name=None, description="", value=None):
         super().__init__(name, description, value)
 
@@ -37,8 +35,6 @@ class StringSetting(Setting):
 
 
 class IntSetting(Setting):
-    """Настройка, принимающая в качестве значения целое число"""
-
     def __init__(
         self,
         name=None,
@@ -76,8 +72,6 @@ class IntSetting(Setting):
 
 
 class BoolSetting(Setting):
-    """Настройка, принимающая в качестве значение True или False"""
-
     def __init__(self, name=None, description="", value=False):
         super().__init__(name, description, value)
 
@@ -90,9 +84,9 @@ class BoolSetting(Setting):
     def widget(self):
         widget = QCheckBox()
         widget.setChecked(self.get_value())
-        widget.setText("Включен" if self.value else "Выключен")
+        widget.setText("Enabled" if self.value else "Disabled")
         widget.stateChanged.connect(
-            lambda state: widget.setText("Включен" if state else "Выключен")
+            lambda state: widget.setText("Enabled" if state else "Disabled")
         )
         widget.stateChanged.connect(self.set_value)
         widget.set_value = lambda v: widget.setCheckState(v)
@@ -100,8 +94,7 @@ class BoolSetting(Setting):
 
 
 class SellectionSetting(Setting):
-    """Настройка, принимающая в качестве значение один строковый элемент из
-    списка возможных элементов"""
+    """A setting which gets one string element from the list of available ones"""
 
     def __init__(self, name=None, description="", value=None, values=OrderedDict()):
         super().__init__(name, description, value)
@@ -123,8 +116,7 @@ class SellectionSetting(Setting):
 
 
 class FileSetting(Setting):
-    """Настройка, принимающая в качестве значения путь до файла в файлововй
-    системе"""
+    """A setting which gets a file path as a value"""
 
     def __init__(self, name=None, description="", value=None, ext=None):
         super().__init__(name, description, value)
@@ -140,7 +132,7 @@ class FileSetting(Setting):
 
 
 class ColorSetting(Setting):
-    """Настройка, принимающая в качестве значения цвет"""
+    """A setting which gets a color as a value"""
 
     def __init__(self, name=None, description="", value=None):
         super().__init__(name, description, value)

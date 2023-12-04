@@ -32,7 +32,7 @@ class ModuleSettings(QWidget):
         self.title.setWordWrap(True)
 
         self.state = QCheckBox()
-        self.state.setText("Включен" if module.enabled else "Выключен")
+        self.state.setText("Enabled" if module.enabled else "Disabled")
         self.state.setDisabled(not module.can_disable)
         self.state.setChecked(module.enabled)
         self.state.stateChanged.connect(self.turn_module)
@@ -65,7 +65,7 @@ class ModuleSettings(QWidget):
             control_widget.setProperty("setting", setting)
             control_widget.setFixedWidth(200)
 
-            reset_setting = QPushButton("Сбросить")
+            reset_setting = QPushButton("Reset")
             reset_setting.setProperty("setting", control_widget.objectName())
             reset_setting.clicked.connect(self.reset_setting)
 
@@ -82,7 +82,7 @@ class ModuleSettings(QWidget):
         self.setLayout(self.main_layout)
 
     def turn_module(self, state):
-        self.state.setText("Включен" if state else "Выключен")
+        self.state.setText("Enabled" if state else "Disabled")
         self.module.toggle(state)
 
     def reset_setting(self):
@@ -102,20 +102,20 @@ class Settings(QMainWindow):
         super().__init__()
 
         self.setGeometry(300, 100, 700, 600)
-        self.setWindowTitle("Настройки")
+        self.setWindowTitle("Settings")
 
         self.core = core
         self.layout = QVBoxLayout()
 
-        self.title = QLabel("Настройки")
+        self.title = QLabel("Settings")
         self.title.setStyleSheet("font-size: 17pt;")
 
         self.layout.addWidget(self.title, alignment=Qt.AlignCenter)
 
-        self.import_button = QPushButton("Импортировать из CSV")
+        self.import_button = QPushButton("Import from CSV")
         self.import_button.clicked.connect(self.import_settings)
 
-        self.export_button = QPushButton("Экспортировать в CSV")
+        self.export_button = QPushButton("Export to CSV")
         self.export_button.clicked.connect(self.export_settings)
 
         self.port_layout = QHBoxLayout()
@@ -161,7 +161,7 @@ class Settings(QMainWindow):
         self.save()
 
         path, _ = QFileDialog.getOpenFileName(
-            self, "Импорт файла", "settings.csv", "CSV Файлы (*.csv)", ""
+            self, "File import", "settings.csv", "CSV files (*.csv)", ""
         )
 
         if path == "":
@@ -183,7 +183,7 @@ class Settings(QMainWindow):
         self.save()
 
         path, _ = QFileDialog.getSaveFileName(
-            self, "Экспорт файла", "settings.csv", "CSV Файлы (*.csv)", ""
+            self, "File export", "settings.csv", "CSV files (*.csv)", ""
         )
 
         if path == "":

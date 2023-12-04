@@ -5,25 +5,25 @@ from modules.edit_buffer import EOL_WINDOWS
 from setting import BoolSetting, StringSetting
 
 
-NAME = "Статусбар"
-DESCRIPTION = "На статусбаре расположена информация об открытом файле"
+NAME = "Statusbar"
+DESCRIPTION = "Statusbar has information about opened file"
 
 DEFAULT_SETTINGS = {
     "delimiter": StringSetting(
-        name="Разделитель элементов",
+        name="Component delimeter",
         value=" | ",
     ),
     "show_name": BoolSetting(
-        name="Показывать имя буфера",
+        name="Show buffer name",
         value=True,
     ),
     "show_eol": BoolSetting(
-        name="Показывать EOL",
-        description="EOL - конец каждой строки файла, может быть либо LF (\\n), либо CR LF (\\r\\n)",
+        name="Show EOL",
+        description="EOL is the end of each text line of the file, may be either LF (\\n), or CR LF (\\r\\n)",
         value=True,
     ),
     "show_encoding": BoolSetting(
-        name="Показывать кодировку",
+        name="Show file encoding",
         value=True,
     ),
 }
@@ -55,7 +55,7 @@ class Statusbar(Module):
         self.core.statusBar().removeWidget(self.widget)
 
     def generate(self, buffer):
-        """Генерирует и возвращает текст для статусбара"""
+        """Generates and returns statusbar text"""
 
         detailed_name = (
             buffer.name

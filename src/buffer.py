@@ -4,28 +4,28 @@ import charset_normalizer
 
 from utils import FileType
 
-DEFAULT_EMPTY_BUFFER_NAME = "Безымянный"
+DEFAULT_EMPTY_BUFFER_NAME = "Unnamed"
 
-# Перечисление возможных синхронизаций. Сихронизировать можно либо текст буфера
-# с файлом (Sync.TO_FILE), либо содержимое файла с буфером (Sync.FROM_FILE)
+# We can either sync text of the buffer with the file (Sync.TO_FILE) or file
+# content with the buffer (Sync.FROM_FILE)
 Sync = Enum("Sync", ["FROM_FILE", "TO_FILE"])
 
 
 class BufferException:
-    """Класс всех исключений, связанных с буферами"""
+    pass
 
 
 class NoSyncFileError(BufferException):
-    """Исключение, вызываемое при попытке синхронизировать текстовый буфер с не
-    указанным файлом синхронизации"""
+    """Exception raised when trying syncing text buffer with unpointed sync
+    file"""
 
 
 class EncodingGuessError(BufferException):
-    """Исключение, вызываемое при неудачной попытке определить кодировку файла"""
+    """Exception raised with failed attempt of file encoding guess"""
 
 
 class Buffer:
-    """Абстрактный текстовый буфер редактора"""
+    """Abstract text editing buffer"""
 
     def __init__(
         self,
@@ -33,12 +33,12 @@ class Buffer:
         sync_file=None,
         text="",
     ):
-        """Инициализирует буфер
+        """Initializes a buffer
 
-        Параметры:
-        empty_name - название буфера, не имеющего файла для синхронизации
-        sync_file  - файл для синхронизации
-        text       - начальный текст буфера
+        Params:
+        empty_name - name of the buffer without file to sync with
+        sync_file  - file to sync with
+        text       - starting content of the buffer
 
         """
 
@@ -64,15 +64,12 @@ class Buffer:
         self.file_encoding = self.determine_encoding()
 
     def set_text(self, text):
-        """Устанавливает текст буфера"""
-
         self.text = text
         self.desync()
 
     def determine_encoding(self):
-        """Пытается определить кодировку привязанного к буферу файла
-        сихнронизации. Вызывает исключение NoSyncFileError, если файл для
-        синхронизации не установлен"""
+        """Tries to guess the encoding of the linked sync file. Raises
+        NoSyncFileError if there's no sync file linked within buffer"""
 
         if self.file is None:
             raise NoSyncFileError
@@ -85,10 +82,10 @@ class Buffer:
         return guess.encoding
 
     def sync(self, kind=Sync.TO_FILE):
-        """Синхронизирует текст буфера с файлом (kind=Sync.TO_FILE), либо
-        содержимое файла с буфером (kind=Sync.FROM_FILE). Вызывает исключение
-        NoSyncFileError, если файл для синхронизации не установлен или
-        EncodingGuessError, если не удалось определить его кодировку"""
+        """Synchronizes text of the buffer with a file content
+        (kind=Sync.TO_FILE) or file content with the text of the buffer
+        (kind=Sync.FROM_FILE). Raises NoSyncFileError if there's no linked sync
+        file or EncodingGuessError if failed to determine file encoding"""
 
         if self.file is None:
             raise NoSyncFileError
@@ -116,46 +113,45 @@ class Buffer:
         self.refresh_name()
 
     def _sync(self):
-        """Устанавливает флаг синхронизации буфера с файлом синхронизации в
-        True. Данный метод должен быть использован только классом Buffer либо в
-        исключительных случаях, чтобы по особому обработать буфер"""
+        """Sets buffer synchronization flag to True. This method should be used
+        only with Buffer class or in the special cases to handle buffer
+        specifically"""
 
         self.synchronized = True
 
     def desync(self):
-        """Десинхронизирует буфер с файлом синхронизации"""
+        """Desyncs buffer with the linked sync file"""
         self.synchronized = False
 
     def refresh_name(self):
-        """Обновляет имя буфера в соответствии с именем файла синхронизации"""
+        """Refreshes name of the buffer according to the name of the linked sync file"""
         self.name = self.empty_name if self.file is None else self.file.split("/")[-1]
 
     def file_type(self):
-        """Возвращает вариант перечисления FileType в соответствии с расширением
-        прикрепленного к буферу файла синхронизации"""
+        """Returns variant of the FileType enum according to the extension of
+        the linked sync file"""
         try:
             return FileType.from_ext(self.file.split(".")[-1])
         except:
             return None
 
     def is_empty(self):
-        """Возвращает True, если буфер не имеет прикрепленного файла и является
-        пустым, иначе - False"""
+        """Returns whether the buffer has no linked file and is empty"""
         return self.name == self.empty_name and self.text == ""
 
 
 class BufManager:
-    """Менеджер управления текстовыми буферами"""
+    """Text buffer manager"""
 
     def __init__(self):
         self.buffers = {}
 
     def add(self, gui_link, *args, **kwargs):
-        """Добавить буфер с заданными параметрами.
+        """Add a buffer with the defined params
 
-        Параметры:
-        gui_link - ссылка на графический буфер, с которым
-                   необходимо связать созданный абстрактный буфер
+        Params:
+        gui_link - link to the graphical buffer to link just created
+                   abstract buffer
         """
 
         self.buffers[gui_link] = Buffer(*args, **kwargs)
@@ -168,11 +164,11 @@ class BufManager:
         self.current_link = gui_link
 
     def add_empty(self, gui_link):
-        """Добавить пустой буфер"""
+        """Add empty buffer"""
         self.add(gui_link)
 
     def remove(self, gui_link, new_current=None):
-        """Удаляет буфер"""
+        """Removes buffer"""
         del self.buffers[gui_link]
 
         if gui_link != self.current_link:
@@ -187,12 +183,12 @@ class BufManager:
         return len(self.buffers)
 
     def __getitem__(self, gui_link):
-        """Возвращает буфер, привязанный к данному графическому буферу"""
+        """Returns buffer linked with the current graphical one"""
         return self.buffers[gui_link]
 
 
 class GuiBuffer:
-    """Общий класс графических буферов"""
+    """General graphical buffer class"""
 
     def __init__(self):
         self.buffer = ""

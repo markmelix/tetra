@@ -1,67 +1,49 @@
 # Tetra Editor
 
-Модульный редактор кода с графическим интерфейсом. В редакторе можно создавать,
-сохранять и переключатся между файлами с помощью таббара. Также имеется
-подсветка кода и отключаемый статусбар, в котором расположена информация о
-текущем открытом файле. Из коробки доступно 6 модулей, 3 из которых можно
-настраивать.
+Modular code editor with graphical user interface. In the editor you can create, save and switch between files using tabbar. There's also syntax highlighting and turnable statusbar displaying information about current opened file. There're 6 modules out-of-the box, 3 of which are customizable.
 
-Основные возможности редактора:
-- Создание, сохранение и переключение между файлами.
-- Подсветка кода, нумерация строк, подсветка текущей строки
-- Выбор темы и настройка внешнего вида редактора
-- Настройка отображаемых в статусбаре блоков
-- Возможность экспортировать и импортировать настройки редактора
-- Включение, отключение и настройка компонентов программы
+Main editor features:
+- Creation, saving and switching between files.
+- Syntax highlighting, line numbers, current line highlighting
+- Theme choosing and editor appearance customization
+- Configuration of the shown statusbar blocks
+- Exporting and importing editor settings
+- Enabling, disabling and configuring different program components
 
-## Описание реализации
+## Implementation
 
-Всего в проекте имеется порядка 30 классов, каждый из которых используется для реализации определенной функции.
+Now there're about 30 classes in the project. Every class's being used for implementation of a specific function.
 
-### Описание основных классов
+### Description of the main classes
 
-1. Core: Ядро редактора, которое управляет всеми процессами в редакторе и доступ
-   к которому имеют все модули
-2. Event: Класс-перечисление, в котором указаны все возможные события
-3. Module: Определяет каждый модуль как совокупность общих методов, позволяющих взаимодействовать с ним через общий интерфейс
-4. Buffer: Представитель абстрактных текстовых буферов, с которыми пользователь может взаимодействовать с помощью графических буферов (см. GuiBuffer)
-5. BufferManager: Менеджер-хранилище абстрактных буферов (Buffer)
-6. GuiBuffer: Графический буфер редактирования, в котором происходит непосредственно набор и взаимодействие с текстом
-7. Setting: Общий класс-представитель всех настроек модулей
-8. Settings: Независимый виджет, через который пользователю предоставляется управление настройками модулей
+1. `Core`: editor core which controls all the editor processes. Every module has access to that class
+2. `Event`: enumeration where all the possible events are specified
+3. `Module`: determines every module as a set of the common methods giving an ability to interact with it through the common interface
+4. `Buffer`: an abstract text buffer. The user can communicate with it using GuiBuffer
+5. `BufferManager`: abstract buffer management-storage
+6. `GuiBuffer`: a graphical text editing buffer. The user types text here
+7. `Setting`: a common presenter of every module setting
+8. `Settings`: independent widget through which the user can control module settings
 
-### Система-событый
+### Event system
 
-Как только в редакторе что-то происходит (например, открывается файл), сразу
-после этого в специальный список (Core.events) добавляется новое событие и
-подается сигнал на поверхностное обновление всех модулей редактора (метод
-Module.refresh) для обработки этого события. Все эти процессы можно обобщить и
-обобщенную систему назвать Event-системой, или системой событий. Система событий
-не выражена отдельным классом, а встроена непосредственно в ядро редактора и
-взаимодействие с ней происходит с помощью специальных методов.
+Whenever there's something to happen in the editor (e. g. a file gets opened), just after that a new event is going to be appended to the special list (`Core.events`) and all editor refresh methods (`Module.refresh`) get triggered. The system linking all these processes is an Event-system. The Event-system isn't represented as a separate class, but instead it's injected right into the editor core and one can interact with it through special Core methods.
 
-Для того чтобы вызвать новое событие и оповестить об этом все модули,
-используется метод Core.raise_event(event), где event - событие (один из
-вариантов класса-перечисления Event). Также для удобства имеется декоратор
-event.apply_event, который оборачивает нужный метод ядра так, чтобы после его
-вызова сразу вызывалось указанное событие.
+To raise a new event and notify all the modules about that `Core.raise_event(event)` method's used, where event is one of the `Event` enumeration variants. Also there's a convenient decorator `Event.apply_event` which wraps the needed `Core` method so that after one gets called the applied events gets raised.
 
-## Технологии, используемые в проекте
+### Project stack
 
-Проект написан целиком и полностью на Python с использованием PyQt5 в качестве
-графической библиотеки.
+The project is written on the Python completely with the use of PyQt5 GUI library.
 
-Используемые библиотеки:
-- PyQt5: Обертка Qt для создания GUI программ
-- QScintilla: Обертка Scintilla для создания функциональных буферов
-  редактирования кода
-- charset-normalizer: Библиотека, используемая для определения кодировки
-  открытого файла
+Used libraries:
+- PyQt5: Qt wrapper for GUI programs creation
+- QScintilla: Scintilla wrapper for functional text editing buffer creation
+- charset-normalizer: library used to determine opened file encoding
 
-## Автор проекта
+## Project author
 
-Автор проекта: Меликсетян Марк <markmelix@gmail.com>
+Mark Meliksetyan <markmelix@gmail.com>
 
-## Лицензия
+## License
 
-[MIT](LICENSE)
+[MIT](License)

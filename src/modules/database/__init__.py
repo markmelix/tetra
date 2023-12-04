@@ -4,8 +4,8 @@ from copy import deepcopy
 
 import sqlite3
 
-NAME = "База данных"
-DESCRIPTION = "Сохраняет состояние настроек редактора в базу данных"
+NAME = "Database"
+DESCRIPTION = "Saves editor settings to the sqlite3 database"
 
 DB_FILE = "tetra.db"
 
@@ -29,17 +29,15 @@ class Database(Module):
         super().__init__(NAME, DESCRIPTION, DEFAULT_SETTINGS, core, can_disable=False)
 
     def connect(self):
-        """Устанавливает соединение с базой данных"""
-
         self.con = sqlite3.connect(DB_FILE)
 
     def create_tables(self):
-        """Создает нужные таблицы в базе данных, если они ещё не были созданы"""
+        """Creates needed tables if they aren't"""
 
         self.con.executescript(CREATE_TABLES_QUERY)
 
     def inject_features(self):
-        """Внедряет функционал для работы с базой данных в программу"""
+        """Injects db functionality into the program"""
 
         con = self.con
         cur = self.con.cursor()
@@ -111,12 +109,10 @@ class Database(Module):
         self.core.con = self.con
 
     def disconnect(self):
-        """Прерывает соединение с базой данных"""
-
         self.core.con.close()
 
     def eject_features(self):
-        """Убирает функционал для работы с базой данных из программы"""
+        """Eject db features from the program"""
 
         Module.__init__ = Module._Module__init
         Module.enable = Module._Module__enable

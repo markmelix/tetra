@@ -18,8 +18,7 @@ class FileType(Enum):
 
     @classmethod
     def from_ext(cls, ext):
-        """Возвращает вариант перечисления FileType в соответствии с переданным
-        расширением файла"""
+        """Returns FileType enum variant according to the passed file extension"""
 
         assignments = {
             "py": cls.PYTHON,
@@ -35,7 +34,7 @@ class FileType(Enum):
 
 
 class QHSeparationLine(QFrame):
-    """Просто линия для разделения элементов"""
+    """Just separation line"""
 
     def __init__(self):
         super().__init__()
@@ -48,7 +47,7 @@ class QHSeparationLine(QFrame):
 
 
 class EnhancedQComboBox(QComboBox):
-    """QComboBox с выключенным скроллингом при наведении мыши"""
+    """QComboBox with on-hover-scrolling turned off"""
 
     def __init__(self, scrollWidget=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -63,7 +62,7 @@ class EnhancedQComboBox(QComboBox):
 
 
 class EnhancedQSpinBox(QSpinBox):
-    """QSpinBox с выключенным скроллингом при наведении мыши"""
+    """QSpinBox with on-hover-scrolling turned off"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

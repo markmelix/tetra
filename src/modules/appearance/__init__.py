@@ -2,13 +2,13 @@ from module import Module
 from event import Event
 from setting import *
 
-NAME = "Внешний вид"
-DESCRIPTION = "Делает редактор кода графическим"
+NAME = "Appearance"
+DESCRIPTION = "Makes the editor graphical"
 
 DEFAULT_SETTINGS = {
     "theme_file": FileSetting(
-        name="Файл темы программы",
-        description="Тема программы - это QSS файл, в котором прописаны стили различных элементов программы",
+        name="Theme file",
+        description="Program theme is a QSS file containing styles of different program elements",
         value="",
         ext="qss",
     ),
