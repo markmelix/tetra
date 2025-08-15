@@ -26,7 +26,9 @@ If you'd like to contribute to the tetra, clone the repository and run `nix deve
 
 ### Other Linux distributions
 
-If you have Python installed, clone the repository and build tetra with `./build.sh` command. Then you'll have the binary located at `./target/linux/dist` directory.
+Download binary from the [releases](https://github.com/markmelix/tetra/releases) page.
+
+Otherwise, if you have Python installed, clone the repository and build tetra with `./build.sh` command. Then you'll have the binary located at `./target/linux/dist` directory.
 
 If you'd like to contribute, create Python environment whichever way you like and install dependecies listed in `requirements.txt`. Then make your changes.
 
