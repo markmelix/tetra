@@ -10,6 +10,26 @@ Main editor features:
 - Exporting and importing editor settings
 - Enabling, disabling and configuring different program components
 
+## Running
+
+### Via nix package manager
+
+Whichever Linux distribution you have, if you have nix package manager installed, you may run tetra with this command:
+
+``` sh
+nix --extra-experimental-features "nix-command flakes" run github:markmelix/tetra
+```
+
+Or add it as an input to your flake.nix and then throw it to the Home Manager package list to have it permanently installed on your system.
+
+If you'd like to contribute to the tetra, clone the repository and run `nix develop`. Then make your changes having all development dependencies provided by the flakes environment. 
+
+### Other Linux distributions
+
+If you have Python installed, clone the repository and build tetra with `make build` command. Then you'll have the binary located at `./target/linux/dist` directory.
+
+If you'd like to contribute, create Python environment whichever way you like and install dependecies listed in `requirements.txt`. Then make your changes.
+
 ## Implementation
 
 Now there're about 30 classes in the project. Every class's being used for implementation of a specific function.
